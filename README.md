@@ -29,24 +29,24 @@ After cloning, the commands are available from your OpenCode commands directory.
 
 ```text
 /plan/create add live preview for markdown editor
-/plan/do .agent/PLAN-v12-markdown-live-preview-26-06-18-14-10.md
+/plan/do @.agent/PLAN-v12-markdown-live-preview-26-06-18-14-10.md
 ```
 
 Or work in smaller steps:
 
 ```text
 /plan/create migrate settings page to new data model
-/plan/do-partial .agent/PLAN-v13-settings-migration-26-06-18-14-22.md next
-/plan/status .agent/PLAN-v13-settings-migration-26-06-18-14-22.md
+/plan/do-partial @.agent/PLAN-v13-settings-migration-26-06-18-14-22.md next
+/plan/status @.agent/PLAN-v13-settings-migration-26-06-18-14-22.md
 ```
 
 Partial selection examples:
 
 ```text
-/plan/do-partial .agent/PLAN-v13-settings-migration-26-06-18-14-22.md M2
-/plan/do-partial .agent/PLAN-v13-settings-migration-26-06-18-14-22.md T7
-/plan/do-partial .agent/PLAN-v13-settings-migration-26-06-18-14-22.md T7 T8 T9
-/plan/do-partial .agent/PLAN-v13-settings-migration-26-06-18-14-22.md next 2
+/plan/do-partial @.agent/PLAN-v13-settings-migration-26-06-18-14-22.md M2
+/plan/do-partial @.agent/PLAN-v13-settings-migration-26-06-18-14-22.md T7
+/plan/do-partial @.agent/PLAN-v13-settings-migration-26-06-18-14-22.md T7 T8 T9
+/plan/do-partial @.agent/PLAN-v13-settings-migration-26-06-18-14-22.md next 2
 ```
 
 Use `/plan/revise` when the saved plan drifted from the repo or needs a better execution shape.
