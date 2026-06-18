@@ -538,6 +538,7 @@ Requirements:
 - use milestone IDs such as `M1`, `M2`, `M3`
 - milestone IDs must be stable and unique within the revised plan
 - each milestone must have a short stable human label alongside its ID
+- each milestone must include a relative size `MS` from `1-10`
 - keep it short and dependency-ordered
 - each milestone must state:
   - goal
@@ -555,6 +556,7 @@ Requirements:
 - use task IDs such as `T1`, `T2`, `T3`
 - task IDs must be stable and unique within the revised plan
 - group tasks by milestone or phase when relevant
+- each task must include a relative size `S` from `1-10`
 - each task should include:
   - short stable human label
   - owning milestone ID
@@ -568,16 +570,28 @@ Requirements:
 - tasks must be specific enough that a future agent can pick one up and execute it without re-planning the whole project
 - if the source plan already had truthful completed work, preserve or remap it instead of regenerating a fake all-pending tracker
 
+### `### Relative Sizing Rule`
+
+Keep sizing compact and human-facing only.
+
+- `MS` and `S` are relative within this plan only
+- they are not time estimates
+- use `10` for the largest item in scope and size the rest relative to it
+- size by combined implementation weight, such as change surface, dependency complexity, integration risk, and verification breadth
+- ties are fine; avoid fake precision
+- sizing must not change execution order, dependency handling, verification depth, or agent reasoning behavior
+
 ### `## Progress Tracking`
 
 This section is mandatory and must be concise.
 
 Include both:
 
-1. a milestone checklist using markdown checkboxes like `- [ ] M1 ...`
+1. a milestone checklist using markdown checkboxes like `- [ ] M1 [MS:8] ...`
 2. a compact task tracker table with at least these columns:
    - `ID`
    - `Milestone`
+   - `S`
    - `Status`
    - `Hard Depends On`
    - `Deliverable`
@@ -589,6 +603,8 @@ Tracking rules:
 - use compact status labels such as `pending`, `in_progress`, `blocked`, `done`
 - every task row must appear exactly once in the tracker table
 - every task row must use the same stable task ID and milestone ID already defined elsewhere in the revised plan
+- preserve existing `MS` and `S` values when they still fit the revised plan; recalculate only when the task or milestone set materially changes
+- each milestone checklist entry should carry its `MS` value compactly
 - `Hard Depends On` values must use task IDs only or `none`, never vague prose like `backend first`
 - tracker row order is the canonical execution-order tie-breaker when multiple tasks are otherwise runnable
 - do not turn this section into a long diary or duplicate the whole plan narrative
