@@ -17,21 +17,21 @@ Execute a markdown implementation plan artifact end-to-end through code changes,
 
 ## Input Handling
 
-- `$ARGUMENTS` must be one markdown file path or filename to execute.
+- the provided command input must resolve to one markdown file path or filename to execute
 - Accept these forms when they resolve to one existing markdown file:
   - absolute path
   - workspace-relative path
   - exact filename
-- If `$ARGUMENTS` is empty, fail and ask the user for the plan file path.
-- If `$ARGUMENTS` resolves to more than one file, fail and ask for an exact path.
-- Do not treat `$ARGUMENTS` as new planning requirements. It is only the plan file to consume.
+- if no plan file input was provided, fail and ask the user for the plan file path
+- if the provided command input resolves to more than one file, fail and ask for an exact path
+- do not treat the provided command input as new planning requirements; it is only the plan file to consume
 
 ## Hard Fail Rules
 
 Fail immediately without starting implementation if any of these are true:
 
 1. No saved plan artifact can be identified.
-2. Multiple plausible plan files match and `$ARGUMENTS` does not clearly disambiguate.
+2. Multiple plausible plan files match and the provided command input does not clearly disambiguate.
 3. The resolved file is outside the workspace or is not a markdown file.
 4. The file does not look like an execution-ready implementation plan artifact because it lacks the minimum capabilities needed to execute safely, such as:
    - a goal or requested outcome
@@ -39,7 +39,7 @@ Fail immediately without starting implementation if any of these are true:
    - a progress/tracker structure or clearly inferable status markers
    - verification intent or completion checks
 5. The artifact is still an unfinished planning draft, is obviously ambiguous, or explicitly says implementation should not begin yet.
-6. `$ARGUMENTS` is not a path-like reference to one markdown file.
+6. The provided command input is not a path-like reference to one markdown file.
 7. The run begins without first ingesting enough of the plan to determine the current goal, runnable work, tracker state, and verification expectations.
 
 If hard-failing, report the exact reason and ask the user for a valid execution-ready markdown plan file.
