@@ -46,7 +46,7 @@ The command must:
 
 ## Input Handling
 
-- `$1` is required and is the reference command to sync from
+- the first token of the provided command input is the reference command to sync from
 - accept these reference forms when they resolve to one markdown file in the current plan command directory:
   - `create`
   - `revise`
@@ -56,9 +56,9 @@ The command must:
   - `status`
   - `explain`
   - exact filename such as `create.md`
-- any remaining `$ARGUMENTS` text is optional operator guidance, not an automatic scope change
-- if `$1` is missing, fail and ask for one reference command
-- if `$1` resolves ambiguously, fail and ask for one exact file
+- any remaining input text after the reference token is optional operator guidance, not an automatic scope change
+- if no reference token was provided, fail and ask for one reference command
+- if the reference token resolves ambiguously, fail and ask for one exact file
 - do not use files under `.maintenance/` as the reference source for artifact sync
 
 ## Hard Fail Rules
@@ -176,7 +176,7 @@ Carry these policies in this command directly so it stays usable in a fresh sess
 ## Sync Procedure
 
 1. Validate that the current working directory contains `create.md`, `do.md`, `do-partial.md`, and `save.md`.
-2. Resolve the reference command from `$1`.
+2. Resolve the reference command from the first input token.
 3. Read the reference command fully.
 4. Read the likely target commands that share artifact behavior.
 5. Infer the artifact contract from the reference command and identify the concrete drift in each target.
