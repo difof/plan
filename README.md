@@ -40,6 +40,15 @@ Or work in smaller steps:
 /plan/status .agent/PLAN-v13-settings-migration-26-06-18-14-22.md
 ```
 
+Partial selection examples:
+
+```text
+/plan/do-partial .agent/PLAN-v13-settings-migration-26-06-18-14-22.md M2
+/plan/do-partial .agent/PLAN-v13-settings-migration-26-06-18-14-22.md T7
+/plan/do-partial .agent/PLAN-v13-settings-migration-26-06-18-14-22.md T7 T8 T9
+/plan/do-partial .agent/PLAN-v13-settings-migration-26-06-18-14-22.md next 2
+```
+
 Use `/plan/revise` when the saved plan drifted from the repo or needs a better execution shape.
 
 ## License
