@@ -33,7 +33,7 @@ The directory name does not matter. The current working directory contents do.
 
 If those files are not present in the current working directory, stop immediately without asking follow-up questions.
 
-Assume the current working directory is the plan command directory that contains files such as `create.md`, `revise.md`, `save.md`, `do.md`, `do-partial.md`, `status.md`, `explain.md`, and `.maintenance/*.md`.
+Assume the current working directory is the plan command directory that contains files such as `create.md`, `revise.md`, `save.md`, `do.md`, `do-partial.md`, `migrate.md`, `status.md`, `explain.md`, and `.maintenance/*.md`.
 
 The command must:
 
@@ -86,6 +86,7 @@ When relevant, ground the work in the existing system rather than inventing a ne
 High-priority local sources include:
 
 - `create.md` for canonical saved-artifact structure and preview/save discipline
+- `migrate.md` for current in-place artifact normalization and no-op migration criteria
 - `revise.md` for revision, preservation, and delta-discipline behavior
 - `save.md` for persistence constraints
 - `do.md` and `do-partial.md` for execution-consumption expectations
@@ -136,6 +137,7 @@ Minimum required reads for every non-trivial run:
 - `save.md`
 - `do.md`
 - `do-partial.md`
+- `migrate.md`
 - `status.md`
 - `explain.md`
 - `.maintenance/sync-artifact-structure.md`
@@ -145,7 +147,7 @@ Minimum required reads for every non-trivial run:
 Repo-awareness rules:
 
 - do not inspect only the file named in the brief when the requested behavior may depend on shared policy
-- read the commands that define, consume, persist, revise, and explain the artifact before changing shared artifact policy
+- read the commands that define, migrate, consume, persist, revise, and explain the artifact before changing shared artifact policy
 - if the requested change touches maintenance workflows, read both maintenance commands too
 - if a file exists in the current plan command directory and may be affected by the requested change, inspect it before deciding it is irrelevant
 - if a file is intentionally left unchanged, make that a deliberate decision based on repository evidence, not on omission
@@ -159,6 +161,7 @@ Treat these as shared unless the user explicitly chooses divergence:
 - relative sizing fields `MS` and `S`
 - progress-tracking field expectations
 - verification-section shape
+- migration no-op versus normalization criteria
 - semantic alias expectations for artifact-reading commands
 - save-time preservation rules tied to artifact fields
 
@@ -184,17 +187,18 @@ If the request should lead to edits:
 1. Resolve the target files from the brief.
 2. Build repo awareness by reading the local plan command surface required under `## Repo Awareness Requirement`.
 3. Read the files that currently define the behavior being changed.
-4. Identify whether the request is local or shared-policy in nature.
-5. Draft the exact changes before editing. The draft must include:
+4. If the change touches artifact structure or artifact-reading behavior, explicitly consider `migrate.md` alongside `do.md`, `do-partial.md`, `status.md`, and `explain.md` rather than treating migration as optional.
+5. Identify whether the request is local or shared-policy in nature.
+6. Draft the exact changes before editing. The draft must include:
    - affected files
    - files reviewed for repo awareness
    - what behavior or policy will change
    - whether sibling commands will also need syncing
    - any meaningful risk of drift or unintended behavior change
-6. Show a concise end-of-analysis summary before writing anything.
-7. Ask one final save/apply confirmation question with the `question` tool.
-8. Only after explicit approval, patch the files.
-9. Read back the modified regions to verify the landed text is consistent.
+7. Show a concise end-of-analysis summary before writing anything.
+8. Ask one final save/apply confirmation question with the `question` tool.
+9. Only after explicit approval, patch the files.
+10. Read back the modified regions to verify the landed text is consistent.
 
 ## Save and Approval Flow
 
