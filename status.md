@@ -18,26 +18,26 @@ Audit one markdown plan file against the real workspace in read-only mode.
 
 ## Input Handling
 
-- `$ARGUMENTS` must be one markdown file path or filename to audit.
+- the provided command input must resolve to one markdown file path or filename to audit
 - Accept these forms when they resolve to one existing markdown file:
   - absolute path
   - workspace-relative path
   - exact filename
-- If `$ARGUMENTS` is empty, fail and ask the user for the plan file path.
-- If `$ARGUMENTS` resolves to more than one file, fail and ask for an exact path.
-- Do not treat `$ARGUMENTS` as new planning requirements. It is only the plan file to inspect.
+- if no plan file input was provided, fail and ask the user for the plan file path
+- if the provided command input resolves to more than one file, fail and ask for an exact path
+- do not treat the provided command input as new planning requirements; it is only the plan file to inspect
 
 ## Hard Fail Rules
 
 Fail immediately without starting analysis if any of these are true:
 
 1. No plan artifact can be identified.
-2. Multiple plausible plan files match and `$ARGUMENTS` does not clearly disambiguate.
+2. Multiple plausible plan files match and the provided command input does not clearly disambiguate.
 3. The resolved file is outside the workspace or is not a markdown file.
 4. The file does not provide enough plan-like structure to audit implementation status meaningfully.
 5. The run begins without first ingesting enough of the plan to identify the goal, work structure, current status signals, and verification expectations.
 6. The command attempts to modify any workspace file, create any artifact, or mutate git state.
-7. `$ARGUMENTS` is not a path-like reference to one markdown file.
+7. The provided command input is not a path-like reference to one markdown file.
 
 If hard-failing, report the exact reason and ask the user for a valid execution-ready markdown plan file.
 
