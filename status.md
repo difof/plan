@@ -1,5 +1,5 @@
 ---
-description: Read-only implementation status audit for a markdown plan file with full initial plan ingest and in-chat markdown table reporting
+description: Read-only implementation status audit for a markdown plan file using semantic intake and in-chat markdown table reporting
 ---
 
 # Plan Status Harness
@@ -8,13 +8,13 @@ User input: `$ARGUMENTS`
 
 ## Mission
 
-Audit the current implementation status of one markdown plan file in read-only mode.
+Audit one markdown plan file against the real workspace in read-only mode.
 
-- The command must ingest the entire given markdown plan file into chat context before any status analysis begins.
-- The command must not change files, git state, plan status, or any workspace content.
-- The command must scan the workspace and determine what parts of the plan are done, partially done, missing in implementation, not done, blocked, or unclear.
-- If the workspace is inside a git repository, include read-only git status and relevant working-tree condition in the report.
-- Return the result directly in chat as structured markdown tables only, followed by a short summary or `## TL;DR` section.
+- Ingest enough of the plan to audit it fairly.
+- Never change files, git state, plan status, or workspace content.
+- Determine what is `done`, `partial`, `not_done`, `missing`, `blocked`, or `unclear`.
+- If the workspace is a git repo, include read-only git condition.
+- Return markdown tables in chat, followed by a short summary or `## TL;DR`.
 
 ## Input Handling
 
@@ -34,16 +34,8 @@ Fail immediately without starting analysis if any of these are true:
 1. No plan artifact can be identified.
 2. Multiple plausible plan files match and `$ARGUMENTS` does not clearly disambiguate.
 3. The resolved file is outside the workspace or is not a markdown file.
-4. The file does not look like an execution-ready implementation plan artifact, including missing core sections such as:
-   - `## Metadata`
-   - `## Scope`
-   - `## Requirements`
-   - `## Architecture and Design`
-   - `## Task Breakdown`
-   - `## Progress Tracking`
-   - `## Testing and Verification`
-   - `## Acceptance Criteria`
-5. The run begins without first pulling the entire markdown plan file into chat context.
+4. The file does not provide enough plan-like structure to audit implementation status meaningfully.
+5. The run begins without first ingesting enough of the plan to identify the goal, work structure, current status signals, and verification expectations.
 6. The command attempts to modify any workspace file, create any artifact, or mutate git state.
 7. `$ARGUMENTS` is not a path-like reference to one markdown file.
 
@@ -51,8 +43,8 @@ If hard-failing, report the exact reason and ask the user for a valid execution-
 
 ## Non-Negotiable Rules
 
-1. Read the full plan artifact before performing any implementation-status judgment.
-2. At the start of the run, pull the entire markdown plan file into chat context in one complete read, not partial slices.
+1. Read enough of the plan artifact before performing any implementation-status judgment.
+2. Prefer semantic targeted intake first; pull the entire plan only when the document is small, messy, contradictory, or cannot be audited safely from targeted sections.
 3. This command is strictly read-only.
 4. Never edit the plan file.
 5. Never write a report file, scratch file, or tracker file.
@@ -66,28 +58,35 @@ If hard-failing, report the exact reason and ask the user for a valid execution-
 13. Accept both older monolithic `## Testing and Verification` sections and newer split structures using `### Required Verification` plus `### Latest Results`.
 14. Treat `## Revision History` as optional audit context only, never as primary implementation proof.
 15. Do not assume acceptance evidence lives inside `## Acceptance Criteria`; newer artifacts may keep that section criteria-focused and place execution evidence elsewhere.
+16. Parse by semantic role rather than exact heading names whenever possible.
 
 ## Plan Intake Procedure
 
 Before any workspace scan:
 
 1. Resolve the plan path.
-2. Read the full artifact into chat context, not just the summary and not just selected sections.
-3. Extract at minimum:
+2. Start with targeted section discovery by semantic role.
+3. Extract at minimum when available:
    - metadata and declared status
-   - revision history when present
-   - scope and out-of-scope boundaries
-   - constraints and compatibility expectations
-   - roadmap and milestones
-   - implementation breakdown
-   - task list and dependency ordering
-   - file/module targets
-   - testing and verification expectations, including `### Required Verification` and `### Latest Results` when present
-   - acceptance criteria
-   - deferred decisions or blockers
+   - document shape and whether it appears standard, legacy-standard, or custom
+   - goal/requested outcome
+   - tracker, tasks, milestones, or equivalent work structure
+   - verification expectations and latest concise results
+   - blockers, deferred items, or equivalent warning sections
 4. Build the audit checklist from the plan itself before scanning the workspace.
+5. Read deeper only when targeted intake is not enough for a fair status call.
 
-After the initial full-context read, later re-grounding may use targeted reads or grep for specific sections of the same file when context pressure grows, but the run must begin with the entire plan content already in context.
+## Semantic Alias Matrix
+
+Use the same semantic mapping used by `/plan/explain`, `/plan/do`, and `/plan/do-partial`.
+
+- goal: `Goal and Completion Signal`, `Requested Outcome`, `Executive Summary`, `Summary`, `Objective`
+- scope: `Scope Boundaries`, `Scope`, `In Scope`, `Out of Scope`
+- decisions: `Decisions and Open Questions`, `Resolved Clarifications`, `Ambiguity Audit`, `Constraints and Compatibility`, `Alternatives Considered`
+- execution: `Execution Plan`, `Roadmap and Milestones`, `Implementation Breakdown`, `Task Breakdown`, `File and Module Surface`, `File and Module Plan`
+- progress: `Progress Tracking`, `Tracker`, `Task Tracker`, `Checklist`, milestone tables, task tables
+- verification: `Verification`, `Testing and Verification`, `Required Verification`, `Latest Results`
+- blockers: `Risks and Blockers`, `Deferred Decisions or Blockers`, `Open Questions`, `Risks and Mitigations`
 
 ## Read-Only Audit Scope
 
@@ -137,7 +136,7 @@ Rules:
 
 ## Audit Procedure
 
-1. Resolve and ingest the full plan file.
+1. Resolve and ingest enough of the plan to understand it fairly.
 2. Identify the concrete files, modules, commands, tests, and surfaces named by the plan.
 3. Scan the relevant workspace areas in read-only mode.
 4. Compare plan-tracker claims against real code, config, docs, and tests.
@@ -178,7 +177,7 @@ Required report sections:
 
 Required table guidance:
 
-- `## Plan Overview` should include plan path, declared plan status, audit scope, repository type, and overall assessed condition.
+- `## Plan Overview` should include plan path, declared plan status, detected artifact shape (`standard`, `legacy-standard`, or `custom`), audit scope, repository type, and overall assessed condition.
 - `## Milestone Status` should be a markdown table with columns: `Milestone`, `Status`, `Evidence`, `Gaps`.
 - `## Task Status` should be a markdown table with columns: `Task`, `Status`, `Evidence`, `Missing/Next Gap`.
 - `## Requirement and Acceptance Status` should be a markdown table with columns: `Item`, `Status`, `Evidence`, `Gap`.
@@ -195,4 +194,4 @@ When the command run finishes:
 - provide the markdown-table report directly in chat
 - do not create an external artifact
 - end with a short summary section or `## TL;DR`
-- make the summary say whether the plan looks complete, partially implemented, barely started, blocked, or substantially divergent
+- make the summary say whether the plan looks complete, partially implemented, barely started, blocked, substantially divergent, or nonstandard but still auditable
