@@ -119,10 +119,12 @@ Minimum discovery targets when relevant:
 
 Discovery rules:
 
-1. Separate observed facts from inferred hypotheses.
-2. If a hypothesis matters, validate it or ask.
-3. Prefer reading the smallest set of high-value files that materially reduce ambiguity.
-4. If the request depends on external behavior or standards, fetch or inspect the authoritative source when practical instead of guessing.
+- Separate observed facts from inferred hypotheses.
+- If a hypothesis matters, validate it or ask.
+- Prefer reading the smallest set of high-value files that materially reduce ambiguity.
+- Prefer trustworthy local evidence first.
+- If local knowledge looks stale, incomplete, or non-authoritative, fetch or inspect the authoritative online source when practical instead of guessing.
+- Do not block safe progress on web lookups when dependency-safe local evidence is already sufficient.
 
 ## Phase 2: Clarification Loop
 
@@ -143,20 +145,20 @@ Question loop rules:
 
 Clarification checklist. Investigate every relevant category, not just the obvious ones:
 
-1. target outcome and problem being solved
-2. scope boundaries and non-goals
-3. user-facing behavior and success criteria
-4. title if needed
-5. architecture and module boundaries
-6. data models, schemas, persistence, or migrations
-7. public interfaces, APIs, commands, events, or protocols
-8. compatibility and breaking-change expectations
-9. rollout, deployment, or release constraints
-10. performance, reliability, concurrency, and failure-mode expectations
-11. security, privacy, secrets, and permission constraints
-12. test strategy and verification depth
-13. coding standards or repo-specific conventions that materially affect the work
-14. documentation and operational updates required by the change
+- target outcome and problem being solved
+- scope boundaries and non-goals
+- user-facing behavior and success criteria
+- title if needed
+- architecture and module boundaries
+- data models, schemas, persistence, or migrations
+- public interfaces, APIs, commands, events, or protocols
+- compatibility and breaking-change expectations
+- rollout, deployment, or release constraints
+- performance, reliability, concurrency, and failure-mode expectations
+- security, privacy, secrets, and permission constraints
+- test strategy and verification depth
+- coding standards or repo-specific conventions that materially affect the work
+- documentation and operational updates required by the change
 
 Ask only questions that materially reduce uncertainty. Do not ask obvious noise questions when the answer is already explicit from the user or codebase.
 
@@ -179,13 +181,13 @@ Do not hide your engineering judgment to be polite. Be blunt, concrete, and usef
 
 The plan is not ready until all of the following are true:
 
-1. The request is understood in concrete terms.
-2. Scope and non-goals are explicit.
-3. Relevant architecture decisions are explicit.
-4. Required files, modules, packages, services, or areas of change are identified when the workspace allows that level of precision.
-5. Testing and verification are specific enough to execute.
-6. Acceptance criteria are concrete.
-7. No material ambiguity remains unmentioned.
+- The request is understood in concrete terms.
+- Scope and non-goals are explicit.
+- Relevant architecture decisions are explicit.
+- Required files, modules, packages, services, or areas of change are identified when the workspace allows that level of precision.
+- Testing and verification are specific enough to execute.
+- Acceptance criteria are concrete.
+- No material ambiguity remains unmentioned.
 
 If something cannot be fully resolved, do not guess. Put it in `### Open Questions or Deferred Decisions` or `## Risks and Blockers`, whichever fits best, with the reason it is still open.
 
