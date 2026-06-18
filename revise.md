@@ -18,7 +18,7 @@ When revising in place, the final save decision must let the user choose between
 
 The command must:
 
-- ingest the full source plan before proposing revisions
+- ingest enough of the source plan before proposing revisions, then deepen reads only when needed
 - preserve valid decisions and truthful progress that still hold
 - challenge weak architecture, stale assumptions, tracker drift, and vague execution detail
 - incorporate improvement points from the current chat context, referenced prior messages, explicit user guidance, and repository evidence
@@ -26,6 +26,7 @@ The command must:
 - switch to in-place update behavior only when the user explicitly asks to update the existing file instead of creating a new version
 - in `in_place` mode, default revision behavior to preserving the existing file structure and wording wherever they still hold unless the user explicitly chooses a full rewrite at final save time
 - apply strict delta discipline so the revision stays proportional to the approved change
+- prefer the dense canonical structure for new standalone artifacts unless preserving the older shape is materially safer for compatibility or partially executed work
 - in default new-version mode, ensure the saved artifact stands alone and does not reference the source plan artifact it was revised from
 - keep milestone and task tracking explicit enough for bounded execution commands to consume without guessing
 
@@ -50,23 +51,19 @@ Fail immediately without drafting revisions if any of these are true:
 1. No existing plan artifact can be identified.
 2. Multiple plausible source plan files match and the user, current chat, and workspace do not clearly disambiguate one target.
 3. The resolved source file is outside the workspace or is not a markdown file.
-4. The resolved file does not look like a saved implementation plan artifact, including missing core sections such as:
-   - `## Metadata`
-   - `## Scope`
-   - `## Requirements`
-   - `## Architecture and Design`
-   - `## Task Breakdown`
-   - `## Progress Tracking`
-   - `## Testing and Verification`
-   - `## Acceptance Criteria`
-5. The run begins without first pulling the entire source markdown plan file into chat context.
+4. The resolved file does not look like a saved implementation plan artifact because it lacks the minimum capabilities needed to revise safely, such as:
+   - a goal or requested outcome
+   - a work structure that can be revised
+   - a progress/tracker structure or clearly inferable status markers
+   - verification intent or completion checks
+5. The run begins without first ingesting enough of the source markdown plan file to understand its goal, structure, status, and revision needs.
 6. The user is actually asking for a brand new plan with no concrete source artifact to revise. In that case, stop and direct them to `/plan/create`.
 
 If hard-failing, report the exact reason and ask the user for one valid source markdown plan file or to use `/plan/create` instead.
 
 ## Non-Negotiable Rules
 
-1. Read the full source plan artifact before proposing meaningful revisions.
+1. Read enough of the source plan artifact before proposing meaningful revisions.
 2. Treat the source plan as an evidence-bearing baseline, not as untouchable truth.
 3. Ask as many questions as needed. Do not silently preserve weak assumptions just because they are already written down.
 4. Never silently assume missing requirements, architecture, scope, compatibility, progress-state meaning, or testing detail.
@@ -102,23 +99,19 @@ Apply revision pressure to the changed parts, not the whole file by habit.
 4. If one section already carries a point adequately, update the owning section instead of restating it elsewhere.
 5. Keep the revised artifact as short as truth allows for the approved scope.
 6. For narrow revisions, prefer localized edits, compact tracker changes, and concise wording over full-plan expansion.
+7. Do not re-expand a dense artifact back into a larger ceremonial shape unless the user explicitly asks for that style.
 
 ## Section Role Discipline
 
 Every major section owns one primary job. Keep sections tight and non-overlapping.
 
 1. `## Current Context and Evidence` is for observed facts only.
-2. `## Resolved Clarifications` is for user-decided answers only.
-3. `## Scope` and `## Out of Scope` define boundaries only.
-4. `## Requirements` states what must be true, not milestone prose.
-5. `## Architecture and Design` explains structure and responsibilities, not a second requirements list.
-6. `## Roadmap and Milestones` is the high-level execution map only.
-7. `## Implementation Breakdown` is for phase-level workstreams only.
-8. `## Task Breakdown` is for executable tasks only.
-9. `## Progress Tracking` is a compact tracker only, not a diary.
-10. `## File and Module Plan` maps change surfaces only.
-11. `## Testing and Verification` defines required checks and the latest concise results only.
-12. `## Acceptance Criteria` contains end-state completion conditions only, not milestone evidence history.
+2. `## Scope Boundaries` defines boundaries only.
+3. `## Decisions and Open Questions` is for user-decided answers, tradeoffs, and still-open items.
+4. `## Execution Plan` explains structure, milestones, tasks, and change surfaces, not a second goal section.
+5. `## Progress Tracking` is a compact tracker only, not a diary.
+6. `## Verification` defines required checks and the latest concise results only.
+7. `## Goal and Completion Signal` contains the objective and end-state completion conditions only, not milestone evidence history.
 
 ## Revision Priorities
 
@@ -192,13 +185,13 @@ Minimum intake targets:
 
 - source plan metadata and current status
 - requested outcome and scope boundaries
-- resolved clarifications and ambiguity audit
-- roadmap, milestones, and task ordering
+- decisions, open questions, and compatibility constraints
+- milestones, tasks, and task ordering
 - progress tracker state
-- file/module plan
-- testing and verification expectations
-- acceptance criteria
-- deferred decisions or blockers
+- change-surface sections such as files, modules, APIs, or contracts when present
+- verification expectations and latest concise results
+- completion conditions
+- blockers and deferred items
 
 Intake rules:
 
@@ -206,6 +199,18 @@ Intake rules:
 2. Flag stale, weak, duplicated, or contradictory sections.
 3. Identify where the source plan is still strong so those decisions are preserved.
 4. If the source plan already reflects partial implementation progress, treat that as something to validate, not something to erase.
+
+## Semantic Alias Matrix
+
+Use the same semantic mapping used by `/plan/do`, `/plan/do-partial`, `/plan/status`, and `/plan/explain` when reading old or custom artifacts.
+
+- goal: `Goal and Completion Signal`, `Requested Outcome`, `Executive Summary`, `Summary`, `Objective`
+- scope: `Scope Boundaries`, `Scope`, `In Scope`, `Out of Scope`
+- decisions: `Decisions and Open Questions`, `Resolved Clarifications`, `Ambiguity Audit`, `Constraints and Compatibility`, `Alternatives Considered`
+- execution: `Execution Plan`, `Roadmap and Milestones`, `Implementation Breakdown`, `Task Breakdown`, `File and Module Surface`, `File and Module Plan`
+- progress: `Progress Tracking`, `Tracker`, `Task Tracker`, `Checklist`, milestone tables, task tables
+- verification: `Verification`, `Testing and Verification`, `Required Verification`, `Latest Results`
+- blockers: `Risks and Blockers`, `Deferred Decisions or Blockers`, `Open Questions`, `Risks and Mitigations`
 
 ## Phase 2: Ground Truth Re-Discovery
 
@@ -299,7 +304,7 @@ The revised plan is not ready until all of the following are true:
 7. Acceptance criteria are concrete.
 8. No material ambiguity remains unmentioned.
 
-If something cannot be fully resolved, do not guess. Put it in `## Deferred Decisions or Blockers` with the reason it is still open.
+If something cannot be fully resolved, do not guess. Put it in `### Open Questions or Deferred Decisions` or `## Risks and Blockers`, whichever fits best, with the reason it is still open.
 
 ## Versioning and Filename Rules
 
@@ -386,29 +391,16 @@ For `in_place` saves using `patch_plan`, preserve the existing plan's section or
 1. `# Plan: <Human Title>`
 2. `## Metadata`
 3. `## Revision History`
-4. `## Executive Summary`
-5. `## Requested Outcome`
-6. `## Current Context and Evidence`
-7. `## Resolved Clarifications`
-8. `## Ambiguity Audit`
-9. `## Scope`
-10. `## Out of Scope`
-11. `## Constraints and Compatibility`
-12. `## Engineering Standards`
-13. `## Requirements`
-14. `## Architecture and Design`
-15. `## Alternatives Considered`
-16. `## Roadmap and Milestones`
-17. `## Implementation Breakdown`
-18. `## Task Breakdown`
-19. `## Progress Tracking`
-20. `## File and Module Plan`
-21. `## Data, Schema, API, or Contract Changes`
-22. `## Testing and Verification`
-23. `## Acceptance Criteria`
-24. `## Risks and Mitigations`
-25. `## Deferred Decisions or Blockers`
-26. `## References`
+4. `## Goal and Completion Signal`
+5. `## Current Context and Evidence`
+6. `## Scope Boundaries`
+7. `## Decisions and Open Questions`
+8. `## Engineering Standards`
+9. `## Execution Plan`
+10. `## Progress Tracking`
+11. `## Verification`
+12. `## Risks and Blockers`
+13. `## References`
 
 Section requirements:
 
@@ -438,6 +430,25 @@ Additional metadata rules:
 - In `new_version` mode, do not include `revision_of`, `supersedes`, source-plan path fields, or equivalent lineage metadata.
 - In `in_place` mode, do not add cross-artifact lineage metadata; the revised file is the artifact.
 - In `in_place` `patch_plan` mode, update only the metadata fields needed to keep the artifact accurate, such as `updated_at_local`, `request_source`, `revision_mode`, and `revision_reason`, while preserving stable fields unless the user explicitly changes them.
+
+### `## Goal and Completion Signal`
+
+This section replaces the older split between summary, requested outcome, requirements recap, and acceptance recap.
+
+It must include:
+
+- the concrete objective
+- the intended end state
+- the smallest set of completion conditions needed to know the revised plan is truly done
+
+### `## Scope Boundaries`
+
+Structure it as:
+
+- `### In Scope`
+- `### Out of Scope`
+
+Keep this section boundary-focused. Do not turn it into architecture prose.
 
 ### `## Current Context and Evidence`
 
@@ -469,16 +480,21 @@ Each entry must include, in one compact bullet or table row:
 
 In `new_version` mode, do not use this section to point at source filenames or paths. Keep it as compact user-audit context only.
 
-### `## Resolved Clarifications`
+### `## Decisions and Open Questions`
 
-Summarize the important user decisions captured during the questioning loop.
+This section replaces the older split between clarifications, ambiguity audit, constraints, alternatives, and deferred items.
 
-### `## Ambiguity Audit`
+Structure it as:
 
-Must explicitly state:
+- `### Resolved Decisions`
+- `### Open Questions or Deferred Decisions`
 
-- what was ambiguous, stale, weak, or contradictory in the request or prior planning inputs
+Include here when relevant:
+
+- important user decisions captured during the revision loop
+- what was ambiguous, stale, weak, or contradictory in the prior plan or request
 - how each issue was resolved
+- major tradeoffs and rejected stronger alternatives
 - what remains intentionally deferred, if anything
 - a clear statement that no silent assumptions remain in the approved revised plan
 
@@ -500,15 +516,18 @@ Emphasize:
 
 If the user explicitly requested a lower-quality or more centralized approach, record that as a user-directed exception here.
 
-### `## Architecture and Design`
+### `## Execution Plan`
 
-Describe the revised structure in implementation-ready detail. Include boundaries, flows, responsibilities, rationale, and any repaired source-plan weaknesses, not just vague aspirations.
+This section owns implementation structure, not repeated goals.
 
-### `## Alternatives Considered`
+Structure it as:
 
-Include better alternatives that were considered or rejected, especially when the source plan or the user selected a weaker option.
+- `### Milestones`
+- `### Task Breakdown`
+- `### File and Module Surface`
+- `### Data, API, or Contract Changes`
 
-### `## Roadmap and Milestones`
+### `### Milestones`
 
 Provide a concise delivery roadmap that a human or agent can scan quickly.
 
@@ -523,20 +542,9 @@ Requirements:
   - key outputs
   - completion signal
 - each milestone must also list the task IDs it owns in planned execution order
-- avoid duplicating every low-level task here; this section is the high-level execution map
+- avoid duplicating every low-level task here; this subsection is the high-level execution map
 
-### `## Implementation Breakdown`
-
-Break work into concrete phases or workstreams in dependency order.
-
-Each phase should state:
-
-- objective
-- concrete code or system changes
-- dependencies
-- validation focus
-
-### `## Task Breakdown`
+### `### Task Breakdown`
 
 Translate the revised plan into concrete executable tasks.
 
@@ -585,17 +593,17 @@ Tracking rules:
 - only include milestones and tasks that materially matter to implementation tracking
 - the structure should be immediately usable by either a human developer or a future agent session
 
-### `## File and Module Plan`
+### `### File and Module Surface`
 
 Map the intended changes to real files, packages, directories, modules, or surfaces when that information is available.
 
 Do not repeat full task narratives here. This section should answer `where`, not re-explain `why` or `when`.
 
-### `## Data, Schema, API, or Contract Changes`
+### `### Data, API, or Contract Changes`
 
 Cover only what is relevant. If not applicable, say so explicitly.
 
-### `## Testing and Verification`
+### `## Verification`
 
 This section owns verification planning and the latest concise results, not an execution diary.
 
@@ -621,15 +629,16 @@ If timestamped result entries are kept here, they must:
 - use local `YY-MM-DD-HH-MM` 24-hour timestamps
 - remain in chronological order with newest last
 
-### `## Acceptance Criteria`
+### `## Risks and Blockers`
 
-Provide concrete, testable completion conditions.
+Keep this section short.
 
-Keep this section focused on end-state criteria, not milestone evidence history.
+Use it for:
 
-### `## Deferred Decisions or Blockers`
+- meaningful risks that could change execution shape
+- real blockers or deferred items that still matter to completion
 
-Use this only for items that truly remain open. Do not use it as a dumping ground for things you were too lazy to clarify.
+Do not use it as a dumping ground for trivia.
 
 ## Preview and Approval Flow
 
