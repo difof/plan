@@ -17,7 +17,7 @@ Execute only a bounded slice of one saved markdown implementation plan artifact 
 
 ## Input Handling
 
-- `$ARGUMENTS` must begin with one markdown plan file reference.
+- the provided command input must begin with one markdown plan file reference
 - After the plan reference, the remaining tokens choose one of these modes:
   - `<plan>`
   - `<plan> next`
@@ -39,14 +39,14 @@ Execute only a bounded slice of one saved markdown implementation plan artifact 
   - it caps the number of tasks in the selected direct dependency chain
 - If a trailing integer appears after a non-`next` selector, treat that as invalid input instead of guessing whether it is part of the selector or a count override.
 - If no selector is provided, use deterministic `next` mode.
-- If the plan path and selector cannot be separated unambiguously from `$ARGUMENTS`, fail and ask the user for a clearer invocation.
+- if the plan path and selector cannot be separated unambiguously from the provided command input, fail and ask the user for a clearer invocation
 
 ## Hard Fail Rules
 
 Fail immediately without starting implementation if any of these are true:
 
 1. No saved plan artifact can be identified.
-2. Multiple plausible plan files match and `$ARGUMENTS` does not clearly disambiguate one target.
+2. Multiple plausible plan files match and the provided command input does not clearly disambiguate one target.
 3. The resolved file is outside the workspace or is not a markdown file.
 4. The file does not look like an execution-ready implementation plan artifact because it lacks the minimum capabilities needed for bounded execution, such as:
    - a goal or requested outcome
@@ -61,7 +61,7 @@ Fail immediately without starting implementation if any of these are true:
    - explicit task-to-milestone ownership
    - explicit hard dependency mapping by task ID
    - canonical tracker row order that can act as a tie-breaker
-8. `$ARGUMENTS` is not a path-like reference to one markdown plan file followed by an optional valid selector mode.
+8. The provided command input is not a path-like reference to one markdown plan file followed by an optional valid selector mode.
 9. An explicit selector resolves to zero plausible targets or more than one plausible target.
 10. `next` mode cannot identify a single starting task deterministically.
 11. The selected milestone, task, or explicit multi-task list has unmet hard prerequisites outside the selected slice.
