@@ -61,6 +61,13 @@ Partial selection examples:
 
 Use `/plan/revise` when the saved plan drifted from the repo or needs a better execution shape.
 
+Mention in-place if you don't want a new plan artifact with version bump.
+
+```text
+/plan/revise @.agent/PLAN-v13-settings-migration-26-06-18-14-22.md the settings should be removed from plan
+/plan/revise @.agent/PLAN-v13-settings-migration-26-06-18-14-22.md in-place change settings icon 
+```
+
 ## License
 
 AGPL-3.0-only. See `LICENSE`.
