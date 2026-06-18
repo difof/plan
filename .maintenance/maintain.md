@@ -46,8 +46,8 @@ The command must:
 
 ## Input Handling
 
-- `$ARGUMENTS` is the maintenance brief
-- if `$ARGUMENTS` is empty, fail and ask the user for the maintenance request
+- the provided command input is the maintenance brief
+- if no maintenance brief was provided, fail and ask the user for the maintenance request
 - the brief may target:
   - one command
   - multiple commands
