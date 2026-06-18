@@ -25,6 +25,15 @@ After cloning, the commands are available from your OpenCode commands directory.
 - `/plan/revise`: improve an existing saved plan
 - `/plan/explain`: explain a saved plan in plain language
 
+## Maintenance
+
+These are dev-only utilities for maintaining the plan command system itself.
+
+- `/plan/.maintenance/sync-artifact-structure <command>`: infer shared artifact structure from one reference command and align sibling plan commands to it
+- `/plan/.maintenance/maintain <prompt>`: apply a freeform maintenance brief to one or more plan commands, with shared-policy awareness
+
+Use these from inside the plan command directory when working on the command system itself, not when planning application work.
+
 ## Typical Use
 
 ```text
