@@ -158,6 +158,31 @@ Carry these policies in this command directly so it stays usable in a fresh sess
 - if the user prompt is weak during bad-reference recovery, prefer the agent's recommended cleanup direction
 - if cleanup still leaves the source unfit, ask the same three-choice recovery question again instead of freelancing
 
+## Repo Awareness Requirement
+
+Before proposing or applying sync work, build full local awareness of the plan command surface in the current working directory.
+
+Minimum required reads for every non-trivial run:
+
+- `create.md`
+- `revise.md`
+- `save.md`
+- `do.md`
+- `do-partial.md`
+- `status.md`
+- `explain.md`
+- `.maintenance/sync-artifact-structure.md`
+- `.maintenance/maintain.md`
+- `README.md` when the requested change could affect documented behavior or examples
+
+Repo-awareness rules:
+
+- do not assume the reference command and one sibling are enough
+- read the commands that define, consume, persist, revise, and explain the artifact before changing shared artifact policy
+- if the requested change touches maintenance workflows, read both maintenance commands too
+- if a file exists in the current plan command directory and may be affected by the requested change, inspect it before deciding it is irrelevant
+- if a file is intentionally left unchanged, make that a deliberate decision based on repository evidence, not on omission
+
 ## Working Rules
 
 1. Read the reference command fully before proposing any sync.
@@ -178,11 +203,12 @@ Carry these policies in this command directly so it stays usable in a fresh sess
 1. Validate that the current working directory contains `create.md`, `do.md`, `do-partial.md`, and `save.md`.
 2. Resolve the reference command from the first input token.
 3. Read the reference command fully.
-4. Read the likely target commands that share artifact behavior.
+4. Build repo awareness by reading the local plan command surface required under `## Repo Awareness Requirement`.
 5. Infer the artifact contract from the reference command and identify the concrete drift in each target.
 6. Draft a concise sync summary before editing. The summary must include:
    - reference command used
    - affected files
+   - files reviewed for repo awareness
    - what shared artifact fields or policies were inferred from the reference command
    - what artifact fields or policies will change
    - any intentional non-sync decisions
