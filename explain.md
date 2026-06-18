@@ -1,5 +1,5 @@
 ---
-description: Read one plan file end-to-end and explain it in clear human language, even when the plan does not follow the standard plan artifact format
+description: Explain one plan file in clear human language using semantic intake, even when it does not follow the standard plan artifact format
 ---
 
 # Explain Plan Harness
@@ -8,17 +8,15 @@ User input: `$ARGUMENTS`
 
 ## Mission
 
-Read one given plan file in full, understand it as deeply as possible, and explain it back in a clear, structured, human-readable way.
-
-This command is for explanation, interpretation, and best-effort status understanding.
+Explain one plan file clearly and fairly in read-only mode.
 
 It must:
 
-- ingest the entire plan file before analysis begins
-- accept any reasonable plan format, not just plans produced by `/plan/create`
-- translate dense, vague, or highly technical plan content into plain language
-- identify goals, scope, phases, tasks, dependencies, risks, blockers, and likely execution state when that information exists
-- distinguish clearly between what the plan explicitly says and what is inferred
+- ingest enough of the file before analysis begins
+- accept reasonable plan formats, not just `/plan/create` artifacts
+- translate dense or technical content into plain language
+- identify goals, scope, phases, tasks, dependencies, risks, blockers, and likely execution state when present
+- separate explicit plan facts from inference
 - stay read-only
 
 ## Input Handling
@@ -41,15 +39,15 @@ Fail immediately without analysis if any of these are true:
 2. Multiple plausible files match and `$ARGUMENTS` does not clearly disambiguate.
 3. The resolved file is outside the workspace.
 4. The resolved file does not appear to be a readable text document.
-5. The run begins without first pulling the entire plan file into chat context.
+5. The run begins without first ingesting enough of the plan file to identify its goal, structure, and apparent state.
 6. `$ARGUMENTS` is not a path-like reference to one file.
 
 If hard-failing, report the exact reason and ask the user for one valid plan file path.
 
 ## Non-Negotiable Rules
 
-1. Read the full plan file before explaining anything meaningful.
-2. At the start of the run, pull the entire plan file into chat context in one complete read, not selective slices.
+1. Read enough of the plan file before explaining anything meaningful.
+2. Prefer semantic targeted intake first; read the full file only when the document is small, messy, contradictory, or cannot be explained fairly from targeted sections.
 3. This command is strictly read-only.
 4. Never edit the plan file.
 5. Never write a summary file, scratch file, or tracker file.
@@ -98,7 +96,7 @@ If a category cannot be extracted confidently, mark it as `unclear` or `not expl
 Before any broader interpretation:
 
 1. Resolve the plan path.
-2. Read the full artifact into chat context, not just selected sections.
+2. Start with targeted section discovery by semantic role.
 3. Identify the document shape, such as:
    - formal structured plan
    - semi-structured execution checklist
@@ -116,7 +114,19 @@ Before any broader interpretation:
    - risks, blockers, or open questions
    - testing or verification expectations
    - acceptance or completion signals
-5. Only after the full read, re-read targeted parts if needed for accuracy.
+5. Read deeper only when targeted intake is not enough for an accurate explanation.
+
+## Semantic Alias Matrix
+
+Use the same semantic mapping used by `/plan/status`, `/plan/do`, and `/plan/do-partial`.
+
+- goal: `Goal and Completion Signal`, `Requested Outcome`, `Executive Summary`, `Summary`, `Objective`
+- scope: `Scope Boundaries`, `Scope`, `In Scope`, `Out of Scope`
+- decisions: `Decisions and Open Questions`, `Resolved Clarifications`, `Ambiguity Audit`, `Constraints and Compatibility`, `Alternatives Considered`
+- execution: `Execution Plan`, `Roadmap and Milestones`, `Implementation Breakdown`, `Task Breakdown`, `File and Module Surface`, `File and Module Plan`
+- progress: `Progress Tracking`, `Tracker`, `Task Tracker`, `Checklist`, milestone tables, task tables
+- verification: `Verification`, `Testing and Verification`, `Required Verification`, `Latest Results`
+- blockers: `Risks and Blockers`, `Deferred Decisions or Blockers`, `Open Questions`, `Risks and Mitigations`
 
 ## Best-Effort Status Interpretation
 
@@ -195,7 +205,7 @@ Include:
 - plan path
 - document type or shape
 - apparent title or subject
-- whether it looks like a standard `/plan/create` artifact, a custom plan, or an unclear hybrid
+- whether it looks like a standard dense artifact, an older standard artifact, a custom plan, or an unclear hybrid
 
 ### `## Plain-English Summary`
 
