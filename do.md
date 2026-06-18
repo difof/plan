@@ -8,11 +8,12 @@ User input: `$ARGUMENTS`
 
 ## Mission
 
-Execute a markdown implementation plan artifact end-to-end, carrying the work all the way through code changes, testing, verification, and truthful progress updates.
+Execute a markdown implementation plan artifact end-to-end through code changes, verification, and truthful progress updates.
 
 - The plan file is the canonical execution source of truth.
 - The run is not complete until the plan is fully consumed.
-- "Fully consumed" means every in-scope task is either `done` or explicitly recorded as a hard blocker, every milestone is updated, acceptance criteria are checked against reality, and verification has been run for the implemented work.
+- "Fully consumed" means every in-scope task is either `done` or explicitly recorded as a hard blocker, every milestone is updated, end-state completion conditions are checked against reality, and verification has been run for the implemented work.
+- Start with the smallest plan context that can safely identify the next runnable work. Deepen reads only when that task needs more plan detail.
 
 ## Input Handling
 
@@ -32,63 +33,80 @@ Fail immediately without starting implementation if any of these are true:
 1. No saved plan artifact can be identified.
 2. Multiple plausible plan files match and `$ARGUMENTS` does not clearly disambiguate.
 3. The resolved file is outside the workspace or is not a markdown file.
-4. The file does not look like an execution-ready implementation plan artifact, including missing core sections such as:
-   - `## Metadata`
-   - `## Scope`
-   - `## Requirements`
-   - `## Architecture and Design`
-   - `## Task Breakdown`
-   - `## Progress Tracking`
-   - `## Testing and Verification`
-   - `## Acceptance Criteria`
+4. The file does not look like an execution-ready implementation plan artifact because it lacks the minimum capabilities needed to execute safely, such as:
+   - a goal or requested outcome
+   - a task or milestone structure that can be executed
+   - a progress/tracker structure or clearly inferable status markers
+   - verification intent or completion checks
 5. The artifact is still an unfinished planning draft, is obviously ambiguous, or explicitly says implementation should not begin yet.
 6. `$ARGUMENTS` is not a path-like reference to one markdown file.
-7. The run begins without first pulling the entire markdown plan file into chat context.
+7. The run begins without first ingesting enough of the plan to determine the current goal, runnable work, tracker state, and verification expectations.
 
 If hard-failing, report the exact reason and ask the user for a valid execution-ready markdown plan file.
 
 ## Non-Negotiable Rules
 
-1. Read the full plan artifact before implementing anything.
-2. At the start of the run, pull the entire markdown plan file into chat context in one complete read, not partial slices.
-3. Treat the saved plan as canonical scope, execution order, and acceptance intent.
-4. Do not silently widen scope, narrow scope, or swap architectures.
-5. Do not stop at analysis, partial edits, or the first passing targeted test.
-6. Ordinary implementation friction is not a blocker. Failing tests, broken assumptions, missing small refactors, and integration bugs are work to resolve.
-7. Continue task-by-task until the plan is complete or a real external blocker is hit.
-8. Real blockers are limited to things like missing credentials, unavailable external systems, destructive approval requirements, conflicting user edits that cannot be safely reconciled, or plan contradictions that cannot be resolved from repository evidence.
-9. When a real blocker exists, update the plan artifact truthfully before asking the user for help.
-10. Prefer the smallest correct implementation that satisfies the plan.
-11. Keep the work cohesive. Do not create unnecessary abstractions, giant files, or speculative helpers.
-12. Ignore unrelated dirty-worktree changes. Never revert or overwrite work you did not make unless the user explicitly asks.
-13. Do not create a second project-management document. The plan artifact remains the canonical tracker.
-14. Do not claim completion while any material task is still `pending`, `in_progress`, or `blocked` without explicit blocker documentation.
-15. Keep execution updates compact and patch-like. Do not turn the plan into a running diary.
-16. `## Testing and Verification` must be maintained as two subparts: `### Required Verification` and `### Latest Results`.
-17. `## Acceptance Criteria` must remain criteria-focused. Do not append milestone narratives or long evidence histories there.
-18. Any timestamped execution or verification entries written into the plan must use local `YY-MM-DD-HH-MM` 24-hour format and remain in chronological order with newest last.
+1. Read enough of the plan artifact to execute safely before implementing anything.
+2. Prefer progressive ingest over whole-plan ingestion by default.
+3. Pull the full plan into context only when the artifact is tiny, malformed, contradictory, or the current task cannot be understood safely from targeted sections.
+4. Treat the saved plan as canonical scope, execution order, and acceptance intent.
+5. Do not silently widen scope, narrow scope, or swap architectures.
+6. Do not stop at analysis, partial edits, or the first passing targeted test.
+7. Ordinary implementation friction is not a blocker. Failing tests, broken assumptions, missing small refactors, and integration bugs are work to resolve.
+8. Continue task-by-task until the plan is complete or a real external blocker is hit.
+9. Real blockers are limited to things like missing credentials, unavailable external systems, destructive approval requirements, conflicting user edits that cannot be safely reconciled, or plan contradictions that cannot be resolved from repository evidence.
+10. When a real blocker exists, update the plan artifact truthfully before asking the user for help.
+11. Prefer the smallest correct implementation that satisfies the plan.
+12. Keep the work cohesive. Do not create unnecessary abstractions, giant files, or speculative helpers.
+13. Ignore unrelated dirty-worktree changes. Never revert or overwrite work you did not make unless the user explicitly asks.
+14. Do not create a second project-management document. The plan artifact remains the canonical tracker.
+15. Do not claim completion while any material task is still `pending`, `in_progress`, or `blocked` without explicit blocker documentation.
+16. Keep execution updates compact and patch-like. Do not turn the plan into a running diary.
+17. Verification must be maintained as `### Required Verification` plus `### Latest Results`, whether it lives under the newer `## Verification` section or an older equivalent section.
+18. Any end-state completion section must remain criteria-focused. Do not append milestone narratives or long evidence histories there.
+19. Any timestamped execution or verification entries written into the plan must use local `YY-MM-DD-HH-MM` 24-hour format and remain in chronological order with newest last.
 
 ## Plan Intake Procedure
 
 Before substantial edits:
 
 1. Resolve the plan path.
-2. Read the full artifact into chat context, not just the summary and not just selected sections.
-3. Extract at minimum:
+2. Start with targeted plan discovery:
+   - metadata
+   - goal/requested outcome section
+   - progress/tracker section
+   - verification section
+   - blocker/open-question section if present
+3. Grep or targeted-read headings and task IDs before deciding whether deeper reads are needed.
+4. Extract at minimum:
    - metadata and current status
-   - scope and out-of-scope boundaries
-   - constraints and compatibility expectations
-   - roadmap and milestones
-   - implementation breakdown
+   - top-level goal
+   - current task/milestone statuses
    - task list and dependency ordering
-   - file/module targets
-   - testing and verification requirements
-   - acceptance criteria
-   - deferred decisions or blockers
-4. Validate that the plan still matches the current repository well enough to execute.
-5. If the plan was partially executed earlier, resume from the first unfinished runnable task instead of restarting completed work.
+   - verification requirements and latest concise results
+   - blockers or deferred decisions that still affect execution
+5. Read deeper only when the selected runnable task cannot be executed safely from the initial targeted ingest.
+6. Validate that the plan still matches the current repository well enough to execute.
+7. If the plan was partially executed earlier, resume from the first unfinished runnable task instead of restarting completed work.
 
-After the initial full-context read, later re-grounding may use targeted reads or grep for specific sections of the same file when context pressure grows, but the run must begin with the entire plan content already in context.
+Progressive ingest escalation order:
+
+1. tracker + goal + verification
+2. current milestone and owning task block
+3. decisions/architecture context for the active task
+4. full artifact only when still necessary
+
+## Semantic Alias Matrix
+
+Use the same semantic mapping used by `/plan/do-partial`, `/plan/status`, and `/plan/explain`.
+
+- goal: `Goal and Completion Signal`, `Requested Outcome`, `Executive Summary`, `Summary`, `Objective`
+- scope: `Scope Boundaries`, `Scope`, `In Scope`, `Out of Scope`
+- decisions: `Decisions and Open Questions`, `Resolved Clarifications`, `Ambiguity Audit`, `Constraints and Compatibility`, `Alternatives Considered`
+- execution: `Execution Plan`, `Roadmap and Milestones`, `Implementation Breakdown`, `Task Breakdown`, `File and Module Surface`, `File and Module Plan`
+- progress: `Progress Tracking`, `Tracker`, `Task Tracker`, `Checklist`, milestone tables, task tables
+- verification: `Verification`, `Testing and Verification`, `Required Verification`, `Latest Results`
+- blockers: `Risks and Blockers`, `Deferred Decisions or Blockers`, `Open Questions`, `Risks and Mitigations`
 
 ## Required Plan-File Updates
 
@@ -103,18 +121,18 @@ Update it at these moments:
    - keep milestone checkboxes aligned
 3. When a task reveals a real blocker:
    - mark the task `blocked`
-   - add the blocker to `## Deferred Decisions or Blockers`
+   - add the blocker to the plan's blocker/open-question section
    - set metadata status to `blocked` if progress cannot continue
 4. When verification actually runs:
-    - update `## Testing and Verification` with concise execution results under `### Latest Results`
+    - update the plan's verification section with concise execution results under `### Latest Results`
 5. When acceptance criteria are satisfied:
-    - reflect that in `## Acceptance Criteria` by marking current satisfied or blocked state concisely without turning the section into an evidence log
+    - reflect that in the plan's end-state completion section by marking current satisfied or blocked state concisely without turning the section into an evidence log
 6. When the whole plan is complete:
     - set metadata status to `completed`
 
 Update the artifact truthfully and concisely. Do not turn it into a long diary.
 
-If `## Testing and Verification` is not yet split, normalize it minimally into:
+If verification is still in an older section such as `## Testing and Verification`, normalize it minimally into:
 
 - `### Required Verification`
 - `### Latest Results`
@@ -131,7 +149,7 @@ Plan updates must stay small.
 4. Collapse repeated reruns into one latest outcome instead of appending every failed and passing attempt.
 5. Do not append repeated `check passed` notes when the tracker already proves the same state and no new risk was reduced.
 6. Prefer replacing stale result bullets with a newer concise summary over accumulating a long chronological log.
-7. Do not use `## Acceptance Criteria` as a milestone scrapbook; keep it to current completion conditions and their present status.
+7. Do not use the end-state completion section as a milestone scrapbook; keep it to current completion conditions and their present status.
 8. If multiple timestamped result entries remain, order them oldest to newest so the newest item is last.
 
 ## Re-Grounding Rules
@@ -193,8 +211,8 @@ The run is complete only when all of the following are true:
 2. Milestone checkboxes and task tracker statuses reflect reality.
 3. The implemented code matches the approved scope and does not leave obvious half-finished scaffolding.
 4. Required docs, configs, migrations, scripts, and operational updates from the plan are completed.
-5. `## Testing and Verification` reflects the actual commands and results.
-6. `## Acceptance Criteria` has been checked against the resulting system and remains criteria-focused; satisfied or blocked state is clear without a long evidence history.
+5. The verification section reflects the actual commands and results.
+6. The end-state completion section has been checked against the resulting system and remains criteria-focused; satisfied or blocked state is clear without a long evidence history.
 7. Metadata status accurately reflects the outcome: `completed` when done, `blocked` only when a real blocker prevented completion.
 
 Do not end the run while leaving the plan file claiming progress that does not match reality.
