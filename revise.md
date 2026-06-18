@@ -117,16 +117,16 @@ Every major section owns one primary job. Keep sections tight and non-overlappin
 
 When deciding what to improve, use this priority order:
 
-1. the user's explicit revision request in the current message and `$ARGUMENTS`
+1. the user's explicit revision request in the current message and the provided command input
 2. referenced current-chat context and prior messages in this conversation
 3. concrete repository evidence showing plan drift, missing detail, or changed implementation reality
 4. weaknesses found inside the source plan itself
 
-If `$ARGUMENTS` is empty or vague, infer the improvement targets from the current chat context first, then the workspace, then the source plan.
+If the provided command input is empty or vague, infer the improvement targets from the current chat context first, then the workspace, then the source plan.
 
 ## Input Handling
 
-- `$ARGUMENTS` may contain:
+- the provided command input may contain:
   - a source plan path or filename
   - a new improvement brief
   - both together
@@ -134,9 +134,9 @@ If `$ARGUMENTS` is empty or vague, infer the improvement targets from the curren
   - absolute path
   - workspace-relative path
   - exact filename
-- If `$ARGUMENTS` clearly identifies a source plan file, use it.
-- If `$ARGUMENTS` only describes desired improvements, infer the source plan from current chat context first, then workspace evidence, then ask the user to confirm if needed.
-- If `$ARGUMENTS` is empty, infer both the likely source plan and likely improvement goals from current chat context first, then workspace files, then ask the user to confirm or correct that understanding.
+- if the provided command input clearly identifies a source plan file, use it
+- if the provided command input only describes desired improvements, infer the source plan from current chat context first, then workspace evidence, then ask the user to confirm if needed
+- if the provided command input is empty, infer both the likely source plan and likely improvement goals from current chat context first, then workspace files, then ask the user to confirm or correct that understanding
 - If multiple plausible source plans exist, do not guess. Ask the user to disambiguate.
 - Treat improvement text as revision direction, not as a request to ignore the existing source plan.
 - Ignore older workspace plan artifacts unless they are the source plan, directly referenced as comparison material, or needed to determine version history.
