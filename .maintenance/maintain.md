@@ -18,6 +18,21 @@ This command is for working on the plan slash-command set under the current plan
 - use this file to preserve system policy across sessions so the user does not need to restate the plan-command maintenance approach from scratch every time
 - use `.maintenance/sync-artifact-structure.md` instead when the main job is aligning sibling commands to one reference command's artifact contract
 
+## Directory Prerequisite
+
+This command must hard fail immediately, with no QA, if the current working directory does not contain the real plan command files.
+
+Required cwd signals:
+
+- `create.md`
+- `do.md`
+- `do-partial.md`
+- `save.md`
+
+The directory name does not matter. The current working directory contents do.
+
+If those files are not present in the current working directory, stop immediately without asking follow-up questions.
+
 Assume the current working directory is the plan command directory that contains files such as `create.md`, `revise.md`, `save.md`, `do.md`, `do-partial.md`, `status.md`, `explain.md`, and `.maintenance/*.md`.
 
 The command must:
@@ -54,13 +69,15 @@ If intent is mixed or ambiguous, ask a short clarifying question before preparin
 
 Fail immediately without editing if any of these are true:
 
-1. The current directory does not look like the plan command directory.
+1. The current working directory does not contain `create.md`, `do.md`, `do-partial.md`, and `save.md`.
 2. The requested target files cannot be resolved safely.
 3. The run begins without reading the files that materially govern the requested behavior.
 4. The requested change would obviously desynchronize a shared artifact policy across dependent commands and the user has not approved that divergence.
 5. The brief is too ambiguous to distinguish analysis-only work from file-modifying work.
 
 If hard-failing, report the exact missing prerequisite and stop.
+
+Rule for item 1: hard fail immediately with no QA.
 
 ## Policy Sources
 
@@ -89,6 +106,24 @@ Prefer local command evidence first. Only generalize beyond it when the brief cl
 8. If the user's requested change weakens correctness, maintainability, or execution safety, say so plainly and recommend the stronger alternative before editing.
 9. If the user insists on the weaker direction, honor it, but preserve explicit wording about the tradeoff where it matters.
 10. Do not write files before explicit save/apply approval unless the user directly and clearly asked for immediate editing with no preview gate.
+
+## Shared Maintenance Policies
+
+Carry these policies in this command directly so it stays usable in a fresh session with minimal user steering:
+
+- this command is for maintaining the plan command system itself, not for planning application work
+- prefer local command evidence first
+- keep runtime-critical duplication when it improves live-command reliability
+- do not deduplicate just for elegance if that makes runtime behavior more fragile
+- use the smallest coherent patch set
+- preserve command-specific behavior unless the user explicitly wants a broader rewrite
+- if a shared artifact policy changes, update dependent commands in the same run or explain the intentional divergence
+- never introduce machine-local author paths into runtime guidance
+- do not treat `.maintenance/` files as the source of truth for the plan artifact contract
+- if the request is to think, assess, compare, critique, or propose, stay read-only
+- preview first, save second
+- when the brief is weak but still edit-capable, prefer the strongest evidence-backed interpretation over noisy wording
+- if a shared-policy change is better handled by source-driven alignment, prefer `.maintenance/sync-artifact-structure.md`
 
 ## Shared-Policy Awareness
 
