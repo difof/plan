@@ -125,6 +125,31 @@ Carry these policies in this command directly so it stays usable in a fresh sess
 - when the brief is weak but still edit-capable, prefer the strongest evidence-backed interpretation over noisy wording
 - if a shared-policy change is better handled by source-driven alignment, prefer `.maintenance/sync-artifact-structure.md`
 
+## Repo Awareness Requirement
+
+Before proposing or applying non-trivial maintenance work, build full local awareness of the plan command surface in the current working directory.
+
+Minimum required reads for every non-trivial run:
+
+- `create.md`
+- `revise.md`
+- `save.md`
+- `do.md`
+- `do-partial.md`
+- `status.md`
+- `explain.md`
+- `.maintenance/sync-artifact-structure.md`
+- `.maintenance/maintain.md`
+- `README.md` when the requested change could affect documented behavior or examples
+
+Repo-awareness rules:
+
+- do not inspect only the file named in the brief when the requested behavior may depend on shared policy
+- read the commands that define, consume, persist, revise, and explain the artifact before changing shared artifact policy
+- if the requested change touches maintenance workflows, read both maintenance commands too
+- if a file exists in the current plan command directory and may be affected by the requested change, inspect it before deciding it is irrelevant
+- if a file is intentionally left unchanged, make that a deliberate decision based on repository evidence, not on omission
+
 ## Shared-Policy Awareness
 
 Treat these as shared unless the user explicitly chooses divergence:
@@ -157,17 +182,19 @@ If the user is asking for reasoning rather than edits:
 If the request should lead to edits:
 
 1. Resolve the target files from the brief.
-2. Read the files that currently define the behavior being changed.
-3. Identify whether the request is local or shared-policy in nature.
-4. Draft the exact changes before editing. The draft must include:
+2. Build repo awareness by reading the local plan command surface required under `## Repo Awareness Requirement`.
+3. Read the files that currently define the behavior being changed.
+4. Identify whether the request is local or shared-policy in nature.
+5. Draft the exact changes before editing. The draft must include:
    - affected files
+   - files reviewed for repo awareness
    - what behavior or policy will change
    - whether sibling commands will also need syncing
    - any meaningful risk of drift or unintended behavior change
-5. Show a concise end-of-analysis summary before writing anything.
-6. Ask one final save/apply confirmation question with the `question` tool.
-7. Only after explicit approval, patch the files.
-8. Read back the modified regions to verify the landed text is consistent.
+6. Show a concise end-of-analysis summary before writing anything.
+7. Ask one final save/apply confirmation question with the `question` tool.
+8. Only after explicit approval, patch the files.
+9. Read back the modified regions to verify the landed text is consistent.
 
 ## Save and Approval Flow
 
