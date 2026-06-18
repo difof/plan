@@ -35,10 +35,11 @@ If hard-failing, say clearly that `/plan/save` only saves a plan that was alread
 
 1. Recover the latest eligible finalized plan draft from the current chat/context that was prepared through `/plan/create`.
 2. Do not invent missing sections, requirements, or implementation details.
-3. Follow the save, filename, versioning, title, and artifact rules defined by `/plan/create`.
+3. Follow the save, filename, versioning, title, and dense-artifact rules defined by `/plan/create`.
 4. If the recovered plan is not fully save-ready under `/plan/create` rules, hard fail instead of patching it ad hoc.
 5. Preserve the exact milestone IDs, task IDs, hard dependency mapping, and tracker row order from the approved draft so later execution commands can consume the saved artifact deterministically.
 6. Do not reorder timestamped result or history entries while saving. Persist the approved draft exactly as finalized.
+7. Do not expand a dense approved draft into a larger ceremonial shape during save.
 
 ## Save Flow
 
