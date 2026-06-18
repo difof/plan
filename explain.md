@@ -21,26 +21,26 @@ It must:
 
 ## Input Handling
 
-- `$ARGUMENTS` must be one plan file path or filename to explain.
+- the provided command input must resolve to one plan file path or filename to explain
 - Accept these forms when they resolve to one existing file:
   - absolute path
   - workspace-relative path
   - exact filename
-- If `$ARGUMENTS` is empty, fail and ask the user for the plan file path.
-- If `$ARGUMENTS` resolves to more than one file, fail and ask for an exact path.
+- if no plan file input was provided, fail and ask the user for the plan file path
+- if the provided command input resolves to more than one file, fail and ask for an exact path
 - Prefer markdown plans, but do not reject a clearly text-based plan file just because it is not in the standard artifact format.
-- Do not treat `$ARGUMENTS` as new planning requirements. It is only the plan file to explain.
+- do not treat the provided command input as new planning requirements; it is only the plan file to explain
 
 ## Hard Fail Rules
 
 Fail immediately without analysis if any of these are true:
 
 1. No plan file can be identified.
-2. Multiple plausible files match and `$ARGUMENTS` does not clearly disambiguate.
+2. Multiple plausible files match and the provided command input does not clearly disambiguate.
 3. The resolved file is outside the workspace.
 4. The resolved file does not appear to be a readable text document.
 5. The run begins without first ingesting enough of the plan file to identify its goal, structure, and apparent state.
-6. `$ARGUMENTS` is not a path-like reference to one file.
+6. The provided command input is not a path-like reference to one file.
 
 If hard-failing, report the exact reason and ask the user for one valid plan file path.
 
