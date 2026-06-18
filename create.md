@@ -54,6 +54,7 @@ Do not copy any pre-existing plan blindly. Improve on common plan flaws, includi
 - progress/status clutter that can rot after implementation starts
 - repeated requirements restated across too many sections
 - large-plan ceremony applied to a small bounded change
+- full-section duplication where one dense section would carry the same meaning
 
 ## Section Role Discipline
 
@@ -61,20 +62,26 @@ Every major section owns one primary job. Keep sections tight and non-overlappin
 
 Rules:
 
-1. Do not restate the same requirement in more than two sections unless the second occurrence adds new execution detail that the first section does not contain.
-2. If a point is already captured in `## Requested Outcome`, `## Scope`, or `## Requirements`, later sections should explain implementation shape, tracking, or verification rather than rephrasing the same intent.
+1. Do not restate the same fact in multiple top-level sections unless the later occurrence adds materially new execution detail.
+2. New artifacts should prefer one dense owner section over multiple overlapping sections.
 3. `## Current Context and Evidence` is for observed facts only, not desired behavior.
-4. `## Resolved Clarifications` is for user-decided answers only, not repo evidence or architecture prose.
-5. `## Scope` and `## Out of Scope` define boundaries only, not full design rationale.
-6. `## Requirements` states what must be true, not milestone sequencing or file-by-file implementation notes.
-7. `## Architecture and Design` explains how the solution is structured, not a second full requirements list.
-8. `## Roadmap and Milestones` is the high-level execution map only.
-9. `## Implementation Breakdown` describes phase-level workstreams only.
-10. `## Task Breakdown` contains executable tasks only.
-11. `## Progress Tracking` is a compact tracker only, not a narrative.
-12. `## File and Module Plan` maps change surfaces only, not repeated task prose.
-13. `## Testing and Verification` defines required checks and result placeholders only, not an execution diary.
-14. `## Acceptance Criteria` contains end-state completion conditions only, not milestone evidence history.
+4. `## Scope Boundaries` is for in-scope and out-of-scope boundaries only.
+5. `## Decisions and Open Questions` is for user-decided answers, important tradeoffs, compatibility constraints that materially affect implementation, and still-open items.
+6. `## Execution Plan` owns implementation shape, milestones, task graph, and change surfaces.
+7. `## Progress Tracking` is a compact tracker only, not a narrative.
+8. `## Verification` defines required checks and the latest concise results only, not an execution diary.
+9. `## Goal and Completion Signal` owns the requested outcome and concrete done-state conditions.
+
+## Dense Artifact Rule
+
+For new artifacts, default to the dense canonical structure instead of the older larger section set.
+
+Dense does not mean vague. Dense means:
+
+- one fact, one owner section
+- compact bullets and tables over repeated prose
+- exact technical content preserved
+- enough detail for safe future execution without filler
 
 ## Bounded Plan Heuristic
 
@@ -180,7 +187,7 @@ The plan is not ready until all of the following are true:
 6. Acceptance criteria are concrete.
 7. No material ambiguity remains unmentioned.
 
-If something cannot be fully resolved, do not guess. Put it in `## Deferred Decisions or Blockers` with the reason it is still open.
+If something cannot be fully resolved, do not guess. Put it in `### Open Questions or Deferred Decisions` or `## Risks and Blockers`, whichever fits best, with the reason it is still open.
 
 ## Versioning and Filename Rules
 
@@ -207,33 +214,20 @@ It should be as short as truth allows. Large artifacts are acceptable only when 
 
 The task-tracking structure must be explicit enough that `/plan/do`, `/plan/do-partial`, and `/plan/status` can consume the artifact without guessing task ownership, dependency direction, or execution order.
 
-Required section order:
+Required section order for new artifacts:
 
 1. `# Plan: <Human Title>`
 2. `## Metadata`
-3. `## Executive Summary`
-4. `## Requested Outcome`
-5. `## Current Context and Evidence`
-6. `## Resolved Clarifications`
-7. `## Ambiguity Audit`
-8. `## Scope`
-9. `## Out of Scope`
-10. `## Constraints and Compatibility`
-11. `## Engineering Standards`
-12. `## Requirements`
-13. `## Architecture and Design`
-14. `## Alternatives Considered`
-15. `## Roadmap and Milestones`
-16. `## Implementation Breakdown`
-17. `## Task Breakdown`
-18. `## Progress Tracking`
-19. `## File and Module Plan`
-20. `## Data, Schema, API, or Contract Changes`
-21. `## Testing and Verification`
-22. `## Acceptance Criteria`
-23. `## Risks and Mitigations`
-24. `## Deferred Decisions or Blockers`
-25. `## References`
+3. `## Goal and Completion Signal`
+4. `## Current Context and Evidence`
+5. `## Scope Boundaries`
+6. `## Decisions and Open Questions`
+7. `## Engineering Standards`
+8. `## Execution Plan`
+9. `## Progress Tracking`
+10. `## Verification`
+11. `## Risks and Blockers`
+12. `## References`
 
 Section requirements:
 
@@ -255,18 +249,43 @@ Must include at least:
 
 List the concrete workspace files, docs, interfaces, commands, examples, or observations used to ground the plan.
 
-### `## Resolved Clarifications`
+### `## Goal and Completion Signal`
 
-Summarize the important user decisions captured during the questioning loop.
+This section replaces the older split between summary, requested outcome, requirements recap, and acceptance recap.
 
-### `## Ambiguity Audit`
+It must include:
 
-Must explicitly state:
+- the concrete objective
+- the intended end state
+- the smallest set of completion conditions needed to know the plan is truly done
 
-- what was ambiguous at the start
-- how each ambiguity was resolved
-- what remains intentionally deferred, if anything
-- a clear statement that no silent assumptions remain in the approved plan
+Keep it dense. Do not restate the same completion conditions elsewhere unless verification adds new proof detail.
+
+### `## Scope Boundaries`
+
+Structure it as:
+
+- `### In Scope`
+- `### Out of Scope`
+
+Keep this section boundary-focused. Do not turn it into architecture prose.
+
+### `## Decisions and Open Questions`
+
+This section replaces the older split between clarifications, ambiguity audit, constraints, alternatives, and deferred items.
+
+Structure it as:
+
+- `### Resolved Decisions`
+- `### Open Questions or Deferred Decisions`
+
+Include here when relevant:
+
+- important user decisions
+- compatibility or rollout constraints that materially affect implementation
+- major tradeoffs
+- stronger alternatives that were rejected
+- any still-open blocker or deferred item
 
 ### `## Engineering Standards`
 
@@ -280,17 +299,22 @@ Emphasize:
 - tests for important behavior, edge cases, and regressions
 - verification before claiming completion
 
-If the user explicitly requested a lower-quality or more centralized approach, record that as a user-directed exception here.
+If the user explicitly requested a lower-quality or more centralized approach, record that as a short user-directed exception under `### Resolved Decisions` unless it is so important that it needs its own short bullet block here.
 
-### `## Architecture and Design`
+### `## Execution Plan`
 
-Describe the proposed structure in implementation-ready detail. Include boundaries, flows, responsibilities, and rationale, not just vague aspirations.
+This section owns implementation structure, not repeated goals.
 
-### `## Alternatives Considered`
+Structure it as:
 
-Include better alternatives that were considered or rejected, especially when the user selected a weaker option.
+- `### Milestones`
+- `### Task Breakdown`
+- `### File and Module Surface`
+- `### Data, API, or Contract Changes`
 
-### `## Roadmap and Milestones`
+If one of those subsections is not relevant, say so briefly instead of padding.
+
+### `### Milestones`
 
 Provide a concise delivery roadmap that a human or agent can scan quickly.
 
@@ -305,20 +329,9 @@ Requirements:
   - key outputs
   - completion signal
 - each milestone must also list the task IDs it owns in planned execution order
-- avoid duplicating every low-level task here; this section is the high-level execution map
+- avoid duplicating every low-level task here; this subsection is the high-level execution map
 
-### `## Implementation Breakdown`
-
-Break work into concrete phases or workstreams in dependency order.
-
-Each phase should state:
-
-- objective
-- concrete code or system changes
-- dependencies
-- validation focus
-
-### `## Task Breakdown`
+### `### Task Breakdown`
 
 Translate the plan into concrete executable tasks.
 
@@ -338,6 +351,16 @@ Requirements:
 - tasks must distinguish real hard prerequisites from general notes or contextual sequencing comments
 - task ordering inside each milestone must reflect the preferred execution order when multiple tasks could otherwise start around the same time
 - tasks must be specific enough that a future agent can pick one up and execute it without re-planning the whole project
+
+### `### File and Module Surface`
+
+Map the intended changes to real files, packages, directories, modules, or surfaces when that information is available.
+
+Do not repeat full task narratives here. This subsection should answer `where`, not re-explain `why` or `when`.
+
+### `### Data, API, or Contract Changes`
+
+Cover only what is relevant. If not applicable, say so explicitly.
 
 ### `## Progress Tracking`
 
@@ -366,17 +389,7 @@ Tracking rules:
 - only include milestones and tasks that materially matter to implementation tracking
 - the structure should be immediately usable by either a human developer or a future agent session
 
-### `## File and Module Plan`
-
-Map the intended changes to real files, packages, directories, modules, or surfaces when that information is available.
-
-Do not repeat full task narratives here. This section should answer `where`, not re-explain `why` or `when`.
-
-### `## Data, Schema, API, or Contract Changes`
-
-Cover only what is relevant. If not applicable, say so explicitly.
-
-### `## Testing and Verification`
+### `## Verification`
 
 This section owns verification planning, not execution history.
 
@@ -401,15 +414,16 @@ When later commands write timestamped results into this section, they must:
 - use local `YY-MM-DD-HH-MM` 24-hour timestamps
 - keep entries in chronological order with newest last
 
-### `## Acceptance Criteria`
+### `## Risks and Blockers`
 
-Provide concrete, testable completion conditions.
+Keep this section short.
 
-This section must stay focused on the end state to prove, not the story of how implementation progressed.
+Use it for:
 
-### `## Deferred Decisions or Blockers`
+- meaningful risks that could change execution shape
+- real blockers or deferred items that still matter to completion
 
-Use this only for items that truly remain open. Do not use it as a dumping ground for things you were too lazy to clarify.
+Do not use it as a dumping ground for trivia.
 
 ## Preview and Approval Flow
 
