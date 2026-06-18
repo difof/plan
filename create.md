@@ -88,10 +88,24 @@ Dense does not mean vague. Dense means:
 Keep the plan proportional to the work.
 
 1. If the request is narrow, stay narrow.
-2. Prefer `1-3` milestones for a bounded feature or fix unless repository evidence proves more are needed.
-3. Only list files, tasks, and risks that materially affect implementation.
-4. Do not inflate a small request into a broad product roadmap just to fill every section with large-plan volume.
-5. For small changes, shorter sections are better than repetitive completeness theater.
+2. Use as many milestones and tasks as needed to make execution deterministic, but no more.
+3. Let milestone count emerge from the real dependency structure, repo surfaces, and verification shape instead of defaulting to a compact outline by habit.
+4. Only list files, tasks, and risks that materially affect implementation.
+5. Do not inflate a small request into a broad product roadmap just to fill every section with large-plan volume.
+6. For small changes, shorter sections are better than repetitive completeness theater.
+
+## Decomposition Quality Gate
+
+The plan is not strong enough if milestones or tasks still hide too much work inside generic buckets.
+
+Rules:
+
+1. Keep splitting work until each task is a realistic standalone execution unit.
+2. If a task still bundles multiple distinct deliverables, different verification steps, or clearly different ownership or change surfaces, split it unless the work is truly inseparable.
+3. If a task label still reads like `implement X, Y, and Z`, treat that as a likely sign the task is still too broad.
+4. If a milestone still reads like a broad program phase instead of a coherent delivery slice with a concrete completion signal, split it.
+5. Milestones should summarize grouped delivery slices, not act as a hiding place for unresolved task decomposition.
+6. Do not add fake granularity. Split only until execution stops requiring internal re-planning.
 
 ## Input Handling
 
@@ -355,6 +369,8 @@ Requirements:
 - tasks must distinguish real hard prerequisites from general notes or contextual sequencing comments
 - task ordering inside each milestone must reflect the preferred execution order when multiple tasks could otherwise start around the same time
 - tasks must be specific enough that a future agent can pick one up and execute it without re-planning the whole project
+- tasks should stay narrow enough that one task can be executed, verified, and truthfully tracked without first being broken into a second private sub-plan
+- do not hide multiple major verbs inside one task unless the work is genuinely inseparable at implementation time
 
 ### `### Relative Sizing Rule`
 
