@@ -33,7 +33,7 @@ The directory name does not matter. The current working directory contents do.
 
 If those files are not present in the current working directory, stop immediately without asking follow-up questions.
 
-Assume the current working directory is the plan command directory that contains files such as `create.md`, `revise.md`, `save.md`, `do.md`, `do-partial.md`, `status.md`, and `explain.md`.
+Assume the current working directory is the plan command directory that contains files such as `create.md`, `revise.md`, `save.md`, `do.md`, `do-partial.md`, `migrate.md`, `status.md`, and `explain.md`.
 
 The command must:
 
@@ -53,6 +53,7 @@ The command must:
   - `save`
   - `do`
   - `do-partial`
+  - `migrate`
   - `status`
   - `explain`
   - exact filename such as `create.md`
@@ -109,6 +110,7 @@ Treat these as likely sync candidates when they are present in the reference com
 - relative sizing fields and their non-behavioral rules
 - progress-tracking shape and compactness rules
 - verification section shape and latest-results conventions
+- migration no-op versus normalization criteria for existing artifacts
 - semantic alias expectations for artifact-reading commands
 - save-time preservation rules tied to artifact fields such as IDs, dependency mapping, `MS`, and `S`
 
@@ -138,6 +140,7 @@ If the reference command is internally inconsistent, underspecified, or clearly 
 - `revise.md` may preserve extra rules about truthful progress preservation, new-version versus in-place behavior, and delta discipline
 - `save.md` should stay thin and reference-preserving; it should not become a second planning harness
 - `do.md` and `do-partial.md` should keep progressive semantic intake and execution-update rules while staying aligned with the latest artifact fields
+- `migrate.md` should stay in-place, structure-normalizing, and progress-preserving without inventing new plan scope
 - `status.md` and `explain.md` should stay tolerant and semantic rather than fragile about exact heading names
 
 ## Shared Maintenance Policies
@@ -169,6 +172,7 @@ Minimum required reads for every non-trivial run:
 - `save.md`
 - `do.md`
 - `do-partial.md`
+- `migrate.md`
 - `status.md`
 - `explain.md`
 - `.maintenance/sync-artifact-structure.md`
@@ -178,7 +182,7 @@ Minimum required reads for every non-trivial run:
 Repo-awareness rules:
 
 - do not assume the reference command and one sibling are enough
-- read the commands that define, consume, persist, revise, and explain the artifact before changing shared artifact policy
+- read the commands that define, migrate, consume, persist, revise, and explain the artifact before changing shared artifact policy
 - if the requested change touches maintenance workflows, read both maintenance commands too
 - if a file exists in the current plan command directory and may be affected by the requested change, inspect it before deciding it is irrelevant
 - if a file is intentionally left unchanged, make that a deliberate decision based on repository evidence, not on omission
@@ -204,8 +208,9 @@ Repo-awareness rules:
 2. Resolve the reference command from the first input token.
 3. Read the reference command fully.
 4. Build repo awareness by reading the local plan command surface required under `## Repo Awareness Requirement`.
-5. Infer the artifact contract from the reference command and identify the concrete drift in each target.
-6. Draft a concise sync summary before editing. The summary must include:
+5. If the requested sync touches artifact structure or artifact-reading behavior, explicitly inspect how `migrate.md` classifies no-op versus normalization-worthy drift so sync work does not accidentally turn harmless variance into forced churn.
+6. Infer the artifact contract from the reference command and identify the concrete drift in each target.
+7. Draft a concise sync summary before editing. The summary must include:
    - reference command used
    - affected files
    - files reviewed for repo awareness
@@ -213,10 +218,10 @@ Repo-awareness rules:
    - what artifact fields or policies will change
    - any intentional non-sync decisions
    - any risk of changing behavior beyond artifact structure
-7. If the user asked to think, compare, or propose only, stop after the summary and do not edit.
-8. Otherwise ask one final save/apply confirmation question with the `question` tool.
-9. Only after explicit approval, patch the affected files.
-10. Read back the modified regions to verify the sync landed cleanly.
+8. If the user asked to think, compare, or propose only, stop after the summary and do not edit.
+9. Otherwise ask one final save/apply confirmation question with the `question` tool.
+10. Only after explicit approval, patch the affected files.
+11. Read back the modified regions to verify the sync landed cleanly.
 
 ## Save and Approval Flow
 
