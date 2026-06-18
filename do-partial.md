@@ -11,7 +11,7 @@ User input: `$ARGUMENTS`
 Execute only a bounded slice of one saved markdown implementation plan artifact while keeping the plan file as the canonical execution record.
 
 - Unlike `/plan/do`, this command does not try to consume the whole plan.
-- It must still load the full plan file into chat context before doing any implementation work.
+- It should ingest only the plan slices needed to resolve the bounded target safely.
 - It must update the plan artifact truthfully for the selected slice.
 - The run ends when the selected milestone, task list, or next-task slice is done or explicitly blocked, not when the whole plan is complete.
 
@@ -28,7 +28,7 @@ Execute only a bounded slice of one saved markdown implementation plan artifact 
   - exact milestone ID like `M2`
   - exact task ID like `T7`
   - exact milestone label text or exact task label text from the plan
-  - unique fuzzy text that resolves to one milestone or one task after full plan intake
+  - unique fuzzy text that resolves to one milestone or one task after sufficient plan intake
 - In explicit multi-task mode:
   - every selector after `<plan>` must be an exact task ID like `T7`
   - the provided task ID order is authoritative and must already be dependency-safe
@@ -48,17 +48,13 @@ Fail immediately without starting implementation if any of these are true:
 1. No saved plan artifact can be identified.
 2. Multiple plausible plan files match and `$ARGUMENTS` does not clearly disambiguate one target.
 3. The resolved file is outside the workspace or is not a markdown file.
-4. The file does not look like an execution-ready implementation plan artifact, including missing core sections such as:
-   - `## Metadata`
-   - `## Scope`
-   - `## Requirements`
-   - `## Architecture and Design`
-   - `## Task Breakdown`
-   - `## Progress Tracking`
-   - `## Testing and Verification`
-   - `## Acceptance Criteria`
+4. The file does not look like an execution-ready implementation plan artifact because it lacks the minimum capabilities needed for bounded execution, such as:
+   - a goal or requested outcome
+   - deterministic task or milestone structure
+   - current progress/tracker state
+   - verification intent
 5. The artifact is still an unfinished planning draft, is obviously ambiguous, or explicitly says implementation should not begin yet.
-6. The run begins without first pulling the entire markdown plan file into chat context.
+6. The run begins without first ingesting enough of the plan to determine the bounded target, its dependencies, current status, and verification expectations.
 7. The plan artifact lacks deterministic tracking data required for bounded execution, including any of:
    - stable milestone IDs
    - stable task IDs
@@ -76,55 +72,68 @@ If hard-failing, report the exact reason and ask the user for a valid execution-
 
 ## Non-Negotiable Rules
 
-1. Read the full plan artifact before implementing anything.
-2. At the start of the run, pull the entire markdown plan file into chat context in one complete read, not partial slices.
-3. Treat the saved plan as canonical scope, task graph, execution order, and acceptance intent.
-4. Do not silently widen the selected slice.
-5. For explicit milestone selection, execute only the remaining tasks owned by that milestone.
-6. For explicit task selection, execute only that task.
-7. For explicit multi-task selection, execute only the provided task IDs.
-8. For `next` mode, execute only the selected deterministic chain of task IDs.
-8. Hard fail instead of auto-running prerequisites outside the selected slice.
-9. Ordinary implementation friction inside the selected slice is work to resolve, not a blocker.
-10. Stop after the selected slice is complete or a real blocker is recorded.
-11. Keep the plan artifact truthful at all times.
-12. Do not create a second tracker document. The plan artifact remains the canonical record.
-13. Ignore unrelated dirty-worktree changes. Never revert or overwrite work you did not make unless the user explicitly asks.
-14. Prefer the smallest correct implementation that satisfies the selected slice.
-15. Do not mark the overall plan `completed` unless the whole plan is actually complete.
-16. Do not consume downstream tasks outside the selected slice just because they became unblocked during this run.
-17. Keep execution updates compact and patch-like. Do not turn the plan into a running diary.
-18. `## Testing and Verification` must be maintained as two subparts: `### Required Verification` and `### Latest Results`.
-19. `## Acceptance Criteria` must remain criteria-focused. Do not append milestone narratives or long evidence histories there.
-20. Any timestamped execution or verification entries written into the plan must use local `YY-MM-DD-HH-MM` 24-hour format and remain in chronological order with newest last.
+1. Read enough of the plan artifact to execute the bounded slice safely before implementing anything.
+2. Prefer progressive ingest over whole-plan ingestion by default.
+3. Pull the full plan into context only when the artifact is tiny, malformed, contradictory, or the selected slice cannot be resolved safely from targeted sections.
+4. Treat the saved plan as canonical scope, task graph, execution order, and acceptance intent.
+5. Do not silently widen the selected slice.
+6. For explicit milestone selection, execute only the remaining tasks owned by that milestone.
+7. For explicit task selection, execute only that task.
+8. For explicit multi-task selection, execute only the provided task IDs.
+9. For `next` mode, execute only the selected deterministic chain of task IDs.
+10. Hard fail instead of auto-running prerequisites outside the selected slice.
+11. Ordinary implementation friction inside the selected slice is work to resolve, not a blocker.
+12. Stop after the selected slice is complete or a real blocker is recorded.
+13. Keep the plan artifact truthful at all times.
+14. Do not create a second tracker document. The plan artifact remains the canonical record.
+15. Ignore unrelated dirty-worktree changes. Never revert or overwrite work you did not make unless the user explicitly asks.
+16. Prefer the smallest correct implementation that satisfies the selected slice.
+17. Do not mark the overall plan `completed` unless the whole plan is actually complete.
+18. Do not consume downstream tasks outside the selected slice just because they became unblocked during this run.
+19. Keep execution updates compact and patch-like. Do not turn the plan into a running diary.
+20. Verification must be maintained as `### Required Verification` plus `### Latest Results`, whether it lives under the newer `## Verification` section or an older equivalent section.
+21. Any end-state completion section must remain criteria-focused. Do not append milestone narratives or long evidence histories there.
+22. Any timestamped execution or verification entries written into the plan must use local `YY-MM-DD-HH-MM` 24-hour format and remain in chronological order with newest last.
 
 ## Plan Intake Procedure
 
 Before substantial edits:
 
 1. Resolve the plan path.
-2. Read the full artifact into chat context, not just the summary and not just selected sections.
-3. Extract at minimum:
-   - metadata and current status
-   - scope and out-of-scope boundaries
-   - constraints and compatibility expectations
-   - roadmap and milestones
-   - implementation breakdown
-   - task list and dependency ordering
-   - file/module targets
-   - testing and verification requirements
-   - acceptance criteria
-   - deferred decisions or blockers
-4. Build a deterministic execution model from the plan itself, including:
+2. Start with targeted plan discovery:
+   - metadata
+   - goal/requested outcome section
+   - progress/tracker section
+   - verification section
+   - blocker/open-question section if present
+3. Build a deterministic execution model from the plan itself, including:
    - milestone IDs and labels
    - task IDs and owning milestone IDs
    - explicit hard dependencies by task ID
    - canonical task row order from `## Progress Tracking`
    - current task statuses
+4. Read deeper task, milestone, or decision sections only when target resolution or safe implementation still needs them.
 5. Validate that the plan still matches the current repository well enough to execute.
 6. Resolve the requested mode and compute the exact selected slice before major edits begin.
 
-After the initial full-context read, later re-grounding may use targeted reads or grep for specific sections of the same file when context pressure grows, but the run must begin with the entire plan content already in context.
+Progressive ingest escalation order:
+
+1. tracker + goal + verification
+2. owning milestone and selected task block
+3. decisions/architecture context for the selected slice
+4. full artifact only when still necessary
+
+## Semantic Alias Matrix
+
+Use the same semantic mapping used by `/plan/do`, `/plan/status`, and `/plan/explain`.
+
+- goal: `Goal and Completion Signal`, `Requested Outcome`, `Executive Summary`, `Summary`, `Objective`
+- scope: `Scope Boundaries`, `Scope`, `In Scope`, `Out of Scope`
+- decisions: `Decisions and Open Questions`, `Resolved Clarifications`, `Ambiguity Audit`, `Constraints and Compatibility`, `Alternatives Considered`
+- execution: `Execution Plan`, `Roadmap and Milestones`, `Implementation Breakdown`, `Task Breakdown`, `File and Module Surface`, `File and Module Plan`
+- progress: `Progress Tracking`, `Tracker`, `Task Tracker`, `Checklist`, milestone tables, task tables
+- verification: `Verification`, `Testing and Verification`, `Required Verification`, `Latest Results`
+- blockers: `Risks and Blockers`, `Deferred Decisions or Blockers`, `Open Questions`, `Risks and Mitigations`
 
 ## Deterministic Tracking Requirements
 
@@ -137,7 +146,7 @@ Minimum required signals:
 - every task belongs to exactly one milestone
 - every task lists hard dependencies as task IDs or `none`
 - the task tracker row order is the canonical execution tie-breaker when multiple tasks are otherwise runnable
-- the same IDs are used consistently across `## Roadmap and Milestones`, `## Task Breakdown`, and `## Progress Tracking`
+- the same IDs are used consistently across the plan's milestone/task/tracker structure, whether the headings are the newer dense names or older equivalents
 
 If those signals are missing, contradictory, or only implied in prose, stop and direct the user to regenerate or revise the plan instead of guessing.
 
@@ -226,19 +235,19 @@ Update it at these moments:
    - keep milestone checkboxes aligned when milestone completion changes
 3. When a selected task reveals a real blocker:
    - mark the task `blocked`
-   - add the blocker to `## Deferred Decisions or Blockers`
+   - add the blocker to the plan's blocker/open-question section
    - set metadata status to `blocked` only if no further safe progress can continue in the selected slice
 4. When verification actually runs:
-    - update `## Testing and Verification` with concise execution results under `### Latest Results`
+    - update the plan's verification section with concise execution results under `### Latest Results`
 5. When acceptance criteria are materially affected by the selected slice:
-    - reflect that in `## Acceptance Criteria` by marking current satisfied or blocked state concisely without turning the section into an evidence log
+    - reflect that in the plan's end-state completion section by marking current satisfied or blocked state concisely without turning the section into an evidence log
 6. When the slice ends:
     - if the whole plan is now complete, set metadata status to `completed`
     - otherwise leave metadata status as `in_progress` or `blocked`, whichever is truthful
 
 Do not rewrite unrelated task rows just to make the file look busy.
 
-If `## Testing and Verification` is not yet split, normalize it minimally into:
+If verification is still in an older section such as `## Testing and Verification`, normalize it minimally into:
 
 - `### Required Verification`
 - `### Latest Results`
@@ -255,7 +264,7 @@ Plan updates must stay small.
 4. Collapse repeated reruns into one latest outcome instead of appending every failed and passing attempt.
 5. Do not append repeated `check passed` notes when the tracker already proves the same state and no new risk was reduced.
 6. Prefer replacing stale result bullets with a newer concise summary over accumulating a long chronological log.
-7. Do not use `## Acceptance Criteria` as a milestone scrapbook; keep it to current completion conditions and their present status.
+7. Do not use the end-state completion section as a milestone scrapbook; keep it to current completion conditions and their present status.
 8. If multiple timestamped result entries remain, order them oldest to newest so the newest item is last.
 
 ## Re-Grounding Rules
@@ -326,8 +335,8 @@ The run is complete only when all of the following are true:
 2. Milestone checkboxes and selected task tracker rows reflect reality.
 3. The implemented code matches the approved selected slice and does not leave obvious half-finished scaffolding for that slice.
 4. Required docs, configs, scripts, or operational updates named by the selected slice are completed.
-5. `## Testing and Verification` reflects the actual commands and results for the selected work.
-6. `## Acceptance Criteria` has been updated truthfully for any criteria materially affected by the selected work and remains criteria-focused without a long evidence history.
+5. The verification section reflects the actual commands and results for the selected work.
+6. The end-state completion section has been updated truthfully for any criteria materially affected by the selected work and remains criteria-focused without a long evidence history.
 7. Metadata status accurately reflects the overall plan state after this bounded run.
 
 Do not end the run while leaving the plan file claiming progress that does not match reality.
