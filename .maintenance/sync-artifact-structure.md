@@ -18,6 +18,21 @@ This command exists for development and maintenance of the plan command set itse
 - use this file to propagate artifact-structure changes across the plan command system without manually re-explaining the sync rules each session
 - do not use this file as the source of truth for the artifact contract itself; the chosen reference command is the source of truth for that run
 
+## Directory Prerequisite
+
+This command must hard fail immediately, with no QA, if the current working directory does not contain the real plan command files.
+
+Required cwd signals:
+
+- `create.md`
+- `do.md`
+- `do-partial.md`
+- `save.md`
+
+The directory name does not matter. The current working directory contents do.
+
+If those files are not present in the current working directory, stop immediately without asking follow-up questions.
+
 Assume the current working directory is the plan command directory that contains files such as `create.md`, `revise.md`, `save.md`, `do.md`, `do-partial.md`, `status.md`, and `explain.md`.
 
 The command must:
@@ -41,22 +56,25 @@ The command must:
   - `status`
   - `explain`
   - exact filename such as `create.md`
-  - relative path such as `.maintenance/sync-artifact-structure.md` when explicitly intended
 - any remaining `$ARGUMENTS` text is optional operator guidance, not an automatic scope change
 - if `$1` is missing, fail and ask for one reference command
 - if `$1` resolves ambiguously, fail and ask for one exact file
+- do not use files under `.maintenance/` as the reference source for artifact sync
 
 ## Hard Fail Rules
 
 Fail immediately without editing if any of these are true:
 
-1. The current directory does not look like the plan command directory.
+1. The current working directory does not contain `create.md`, `do.md`, `do-partial.md`, and `save.md`.
 2. The reference command cannot be resolved to one existing markdown file.
-3. The reference command does not contain enough artifact-related structure or policy to infer a safe shared contract.
-4. The run begins without fully reading the reference command and the relevant sibling commands that may need updates.
-5. The requested sync would obviously overwrite command-specific behavior instead of shared artifact behavior.
+3. The resolved reference file is under `.maintenance/` instead of being one of the real plan commands.
+4. The reference command does not contain enough artifact-related structure or policy to infer a safe shared contract.
+5. The run begins without fully reading the reference command and the relevant sibling commands that may need updates.
+6. The requested sync would obviously overwrite command-specific behavior instead of shared artifact behavior.
 
 If hard-failing, report the exact missing prerequisite and stop.
+
+Rule for item 1: hard fail immediately with no QA.
 
 ## Bad Reference Recovery
 
@@ -122,6 +140,24 @@ If the reference command is internally inconsistent, underspecified, or clearly 
 - `do.md` and `do-partial.md` should keep progressive semantic intake and execution-update rules while staying aligned with the latest artifact fields
 - `status.md` and `explain.md` should stay tolerant and semantic rather than fragile about exact heading names
 
+## Shared Maintenance Policies
+
+Carry these policies in this command directly so it stays usable in a fresh session with minimal user steering:
+
+- this command is for maintaining the plan command system itself, not for planning application work
+- prefer local command evidence first
+- keep runtime-critical duplication when it improves live-command reliability
+- do not deduplicate just for elegance if that makes runtime behavior more fragile
+- use the smallest coherent patch set
+- preserve command-specific behavior unless the user explicitly wants a broader rewrite
+- if a shared artifact policy changes, update dependent commands in the same run or explain the intentional divergence
+- never introduce machine-local author paths into runtime guidance
+- never use `.maintenance/` files as the artifact sync source
+- if the request is to think, assess, compare, or propose, stay read-only
+- preview first, save second
+- if the user prompt is weak during bad-reference recovery, prefer the agent's recommended cleanup direction
+- if cleanup still leaves the source unfit, ask the same three-choice recovery question again instead of freelancing
+
 ## Working Rules
 
 1. Read the reference command fully before proposing any sync.
@@ -132,13 +168,14 @@ If the reference command is internally inconsistent, underspecified, or clearly 
 6. If the reference command contains a weak or accidental artifact rule, do not blindly spread it. Call it out and recommend a better sync target or a corrected reference first.
 7. Prefer syncing to the reference command's meaning, not its exact wording, when a target command needs slightly different phrasing for its own mission.
 8. If the user's request is actually a design discussion about the plan system, stay read-only and do not edit.
-9. If a requested change affects the shared artifact contract, keep the synced commands aligned in the same run unless the user explicitly wants a partial divergence.
-10. Before every `question` tool call, emit a short markdown explanation covering current understanding, what remains undecided, and why the decision matters.
-11. Do not duplicate the exact question options in that pre-question explanation.
+9. Keep runtime-critical duplication when it materially improves reliability. Do not collapse duplicated live-command rules just to make the maintenance story prettier.
+10. If a requested change affects the shared artifact contract, keep the synced commands aligned in the same run unless the user explicitly wants a partial divergence.
+11. Before every `question` tool call, emit a short markdown explanation covering current understanding, what remains undecided, and why the decision matters.
+12. Do not duplicate the exact question options in that pre-question explanation.
 
 ## Sync Procedure
 
-1. Validate that the current directory is the plan command directory.
+1. Validate that the current working directory contains `create.md`, `do.md`, `do-partial.md`, and `save.md`.
 2. Resolve the reference command from `$1`.
 3. Read the reference command fully.
 4. Read the likely target commands that share artifact behavior.
