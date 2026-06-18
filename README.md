@@ -21,6 +21,7 @@ After cloning, the commands are available from your OpenCode commands directory.
 - `/plan/save`: save a finalized `/plan/create` draft from the current chat
 - `/plan/do`: execute a saved plan end-to-end
 - `/plan/do-partial`: execute one bounded slice of a saved plan
+- `/plan/migrate`: migrate an old or broken saved plan in place to the current shared structure
 - `/plan/status`: audit real implementation progress against a saved plan
 - `/plan/revise`: improve an existing saved plan
 - `/plan/explain`: explain a saved plan in plain language
