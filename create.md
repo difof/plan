@@ -95,9 +95,9 @@ Keep the plan proportional to the work.
 
 ## Input Handling
 
-- `$ARGUMENTS` is the initial planning request.
-- `$ARGUMENTS` may be missing, vague, partial, contradictory, overly broad, or technically unsound.
-- If `$ARGUMENTS` is missing or weak, infer likely context from the current conversation and workspace, then ask the user to confirm or correct that understanding.
+- the provided command input is the initial planning request
+- the provided command input may be missing, vague, partial, contradictory, overly broad, or technically unsound
+- if the provided command input is missing or weak, infer likely context from the current conversation and workspace, then ask the user to confirm or correct that understanding
 - Ignore older workspace plan artifacts unless the user explicitly asks to use, revise, continue, or supersede them.
 - If the user supplied a title, use it unless they later change it.
 - If no title was supplied, propose a concise implementation-oriented title near the end and let the user correct it before saving.
@@ -244,7 +244,7 @@ Must include at least:
 - file path
 - created_at_local
 - workspace_root
-- request_source summarizing `$ARGUMENTS` and any user refinements
+- request_source summarizing the provided command input and any user refinements
 - status as `approved draft` before implementation begins
 
 ### `## Current Context and Evidence`
