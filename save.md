@@ -65,13 +65,3 @@ Do not dump the full markdown plan in chat. The saved `.md` file is the canonica
 
 - On success: report the saved file path and that the plan was saved from the prior `/plan/create` draft.
 - On failure: report the exact prerequisite that was missing and direct the user back to `/plan/create`.
-
-At the end of the response, append a short re-grounding reference list for documented custom-command locations so a drifting agent can re-read `/plan/create` rules if the prior chat context is too large or unreliable.
-
-Keep this list short and only include harnesses with documented custom slash-command support.
-
-Use this exact list:
-
-- OpenCode: `~/Devel/opencode/commands/plan/create.md`
-
-Do not include undocumented or unverified harness paths.
