@@ -101,6 +101,19 @@ Apply revision pressure to the changed parts, not the whole file by habit.
 6. For narrow revisions, prefer localized edits, compact tracker changes, and concise wording over full-plan expansion.
 7. Do not re-expand a dense artifact back into a larger ceremonial shape unless the user explicitly asks for that style.
 
+## Decomposition Quality Gate
+
+When the source plan uses broad milestone or task buckets, revision should strengthen that execution shape instead of preserving it by inertia.
+
+Rules:
+
+1. Keep splitting revised work until each task is a realistic standalone execution unit.
+2. If a task still bundles multiple distinct deliverables, different verification steps, or clearly different ownership or change surfaces, split it unless the work is truly inseparable.
+3. If a task label still reads like `implement X, Y, and Z`, treat that as a likely sign the task is still too broad.
+4. If a milestone still reads like a broad program phase instead of a coherent delivery slice with a concrete completion signal, split it.
+5. Let milestone count emerge from the real dependency structure, repo surfaces, and verification shape instead of preserving an over-compressed outline by habit.
+6. Do not add fake granularity. Split only until execution stops requiring internal re-planning.
+
 ## Section Role Discipline
 
 Every major section owns one primary job. Keep sections tight and non-overlapping.
@@ -564,6 +577,8 @@ Requirements:
 - tasks must distinguish real hard prerequisites from general notes or contextual sequencing comments
 - task ordering inside each milestone must reflect the preferred execution order when multiple tasks could otherwise start around the same time
 - tasks must be specific enough that a future agent can pick one up and execute it without re-planning the whole project
+- tasks should stay narrow enough that one task can be executed, verified, and truthfully tracked without first being broken into a second private sub-plan
+- do not hide multiple major verbs inside one task unless the work is genuinely inseparable at implementation time
 - if the source plan already had truthful completed work, preserve or remap it instead of regenerating a fake all-pending tracker
 
 ### `### Relative Sizing Rule`
