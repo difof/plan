@@ -21,7 +21,7 @@ Fail immediately without writing anything if any of these are true:
 3. The plan in context is still ambiguous, blocked, awaiting clarification, or was explicitly marked for revision instead of saving.
 4. There are multiple plausible plan drafts in context and the provided command input does not clearly disambiguate which one to save.
 5. The provided command input tries to change scope, requirements, architecture, or content instead of just identifying the already-discussed plan.
-6. The draft lacks the deterministic milestone/task tracking required by `/plan/create`, including stable IDs, explicit milestone ownership, explicit hard dependency mapping, and canonical tracker order.
+6. The draft lacks the deterministic milestone/task tracking required by `/plan/create`, including stable IDs, explicit milestone ownership, explicit hard dependency mapping, canonical tracker order, and execution-sized task decomposition strong enough to save without follow-up re-planning.
 
 If hard-failing, say clearly that `/plan/save` only saves a plan that was already prepared through `/plan/create`, and tell the user to return to `/plan/create` first.
 
@@ -36,7 +36,7 @@ If hard-failing, say clearly that `/plan/save` only saves a plan that was alread
 1. Recover the latest eligible finalized plan draft from the current chat/context that was prepared through `/plan/create`.
 2. Do not invent missing sections, requirements, or implementation details.
 3. Follow the save, filename, versioning, title, and dense-artifact rules defined by `/plan/create`.
-4. If the recovered plan is not fully save-ready under `/plan/create` rules, hard fail instead of patching it ad hoc.
+4. If the recovered plan is not fully save-ready under `/plan/create` rules, including sufficiently decomposed execution-sized tasks, hard fail instead of patching it ad hoc.
 5. Preserve the exact milestone IDs, task IDs, hard dependency mapping, and tracker row order from the approved draft so later execution commands can consume the saved artifact deterministically.
 6. Preserve approved milestone sizes `MS` and task sizes `S` exactly as drafted. Do not invent, normalize, or recalculate them during save.
 7. Do not reorder timestamped result or history entries while saving. Persist the approved draft exactly as finalized.
