@@ -107,6 +107,7 @@ Prefer local command evidence first. Only generalize beyond it when the brief cl
 8. If the user's requested change weakens correctness, maintainability, or execution safety, say so plainly and recommend the stronger alternative before editing.
 9. If the user insists on the weaker direction, honor it, but preserve explicit wording about the tradeoff where it matters.
 10. Do not write files before explicit save/apply approval unless the user directly and clearly asked for immediate editing with no preview gate.
+11. If the request touches artifact structure or artifact-reading behavior, explicitly preserve or intentionally update `migrate.md`'s no-op versus normalization boundary instead of leaving that effect implicit.
 
 ## Shared Maintenance Policies
 
@@ -125,6 +126,7 @@ Carry these policies in this command directly so it stays usable in a fresh sess
 - preview first, save second
 - when the brief is weak but still edit-capable, prefer the strongest evidence-backed interpretation over noisy wording
 - if a shared-policy change is better handled by source-driven alignment, prefer `.maintenance/sync-artifact-structure.md`
+- if a shared artifact-policy change could alter what `migrate.md` treats as no-op versus normalization-worthy drift, surface and preserve or intentionally update that boundary in the same run
 
 ## Repo Awareness Requirement
 
@@ -189,16 +191,18 @@ If the request should lead to edits:
 3. Read the files that currently define the behavior being changed.
 4. If the change touches artifact structure or artifact-reading behavior, explicitly consider `migrate.md` alongside `do.md`, `do-partial.md`, `status.md`, and `explain.md` rather than treating migration as optional.
 5. Identify whether the request is local or shared-policy in nature.
-6. Draft the exact changes before editing. The draft must include:
+6. If the change touches artifact structure or artifact-reading behavior, decide whether it preserves `migrate.md`'s current no-op versus normalization boundary or intentionally changes it, and treat that as an explicit policy decision rather than incidental fallout.
+7. Draft the exact changes before editing. The draft must include:
    - affected files
    - files reviewed for repo awareness
    - what behavior or policy will change
    - whether sibling commands will also need syncing
+   - whether `migrate.md`'s no-op versus normalization boundary is preserved or intentionally changed
    - any meaningful risk of drift or unintended behavior change
-7. Show a concise end-of-analysis summary before writing anything.
-8. Ask one final save/apply confirmation question with the `question` tool.
-9. Only after explicit approval, patch the files.
-10. Read back the modified regions to verify the landed text is consistent.
+8. Show a concise end-of-analysis summary before writing anything.
+9. Ask one final save/apply confirmation question with the `question` tool.
+10. Only after explicit approval, patch the files.
+11. Read back the modified regions to verify the landed text is consistent.
 
 ## Save and Approval Flow
 
