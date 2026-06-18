@@ -435,8 +435,6 @@ Additional metadata rules:
 
 ### `## Goal and Completion Signal`
 
-This section replaces the older split between summary, requested outcome, requirements recap, and acceptance recap.
-
 It must include:
 
 - the concrete objective
@@ -456,7 +454,7 @@ Keep this section boundary-focused. Do not turn it into architecture prose.
 
 List the concrete workspace files, docs, interfaces, commands, tracker state, and implementation observations used to ground the revision.
 
-In `new_version` mode, do not cite the source plan filename or path inside the saved artifact. Carry forward validated facts, but rewrite them as current-plan context.
+In `new_version` mode, do not cite the source plan filename or path inside the saved artifact. Rewrite validated facts as current-plan context.
 
 ### `## Revision History`
 
@@ -469,7 +467,7 @@ Rules:
 - one entry per revise invocation
 - do not turn it into a general execution diary
 - do not list every tiny edit
-- do not make any other command depend on this section for execution logic
+- no other command should depend on this section for execution logic
 
 Each entry must include, in one compact bullet or table row:
 
@@ -480,11 +478,9 @@ Each entry must include, in one compact bullet or table row:
 - short revision reason
 - short summary of what changed
 
-In `new_version` mode, do not use this section to point at source filenames or paths. Keep it as compact user-audit context only.
+In `new_version` mode, do not point this section at source filenames or paths. Keep it as compact user-audit context only.
 
 ### `## Decisions and Open Questions`
-
-This section replaces the older split between clarifications, ambiguity audit, constraints, alternatives, and deferred items.
 
 Structure it as:
 
@@ -494,13 +490,13 @@ Structure it as:
 Include here when relevant:
 
 - important user decisions captured during the revision loop
-- what was ambiguous, stale, weak, or contradictory in the prior plan or request
+- what was ambiguous, stale, weak, or contradictory in the prior plan or revision request
 - how each issue was resolved
 - major tradeoffs and rejected stronger alternatives
 - what remains intentionally deferred, if anything
 - a clear statement that no silent assumptions remain in the approved revised plan
 
-In `new_version` mode, do not turn this section into file-to-file lineage notes or source-plan comparison prose.
+In `new_version` mode, do not turn this section into lineage notes or source-plan comparison prose.
 
 In `in_place` `patch_plan` mode, if the user chooses patching despite a recommended rewrite, record the unresolved or intentionally preserved weaknesses and the explicit tradeoff.
 
@@ -520,7 +516,7 @@ If the user explicitly requested a lower-quality or more centralized approach, r
 
 ### `## Execution Plan`
 
-This section owns implementation structure, not repeated goals.
+This section owns implementation structure, not repeated goal prose.
 
 Structure it as:
 
@@ -583,7 +579,7 @@ Keep sizing compact and human-facing only.
 
 ### `## Progress Tracking`
 
-This section is mandatory and must be concise.
+This section is mandatory and must stay concise.
 
 Include both:
 
@@ -608,7 +604,7 @@ Tracking rules:
 - `Hard Depends On` values must use task IDs only or `none`, never vague prose like `backend first`
 - tracker row order is the canonical execution-order tie-breaker when multiple tasks are otherwise runnable
 - do not turn this section into a long diary or duplicate the whole plan narrative
-- only include milestones and tasks that materially matter to implementation tracking
+- only include milestones and tasks that materially affect implementation tracking
 - the structure should be immediately usable by either a human developer or a future agent session
 
 ### `### File and Module Surface`
@@ -640,7 +636,7 @@ Be specific in `### Required Verification`. Include:
 - manual verification steps for behaviors not fully covered by automation
 - if the source plan already tracked prior verification results that still matter, preserve them concisely and separate them from future required checks
 
-For `### Latest Results`, keep only the latest material outcomes needed to understand current state. Collapse stale pass spam into one concise current summary.
+For `### Latest Results`, keep only the material outcomes needed to understand current state. Collapse stale pass spam into one concise current summary.
 
 If timestamped result entries are kept here, they must:
 
@@ -656,7 +652,7 @@ Use it for:
 - meaningful risks that could change execution shape
 - real blockers or deferred items that still matter to completion
 
-Do not use it as a dumping ground for trivia.
+Do not use it as a dumping ground.
 
 ## Preview and Approval Flow
 
