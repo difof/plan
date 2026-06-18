@@ -19,17 +19,17 @@ Fail immediately without writing anything if any of these are true:
 1. `/plan/create` was not used earlier in the current chat context.
 2. A prior `/plan/create` run exists, but it did not reach a finalized plan draft.
 3. The plan in context is still ambiguous, blocked, awaiting clarification, or was explicitly marked for revision instead of saving.
-4. There are multiple plausible plan drafts in context and `$ARGUMENTS` does not clearly disambiguate which one to save.
-5. `$ARGUMENTS` tries to change scope, requirements, architecture, or content instead of just identifying the already-discussed plan.
+4. There are multiple plausible plan drafts in context and the provided command input does not clearly disambiguate which one to save.
+5. The provided command input tries to change scope, requirements, architecture, or content instead of just identifying the already-discussed plan.
 6. The draft lacks the deterministic milestone/task tracking required by `/plan/create`, including stable IDs, explicit milestone ownership, explicit hard dependency mapping, and canonical tracker order.
 
 If hard-failing, say clearly that `/plan/save` only saves a plan that was already prepared through `/plan/create`, and tell the user to return to `/plan/create` first.
 
 ## Input Handling
 
-- `$ARGUMENTS` is optional.
-- If present, treat it only as a disambiguation hint for which already-finalized `/plan/create` draft to save.
-- Never treat `$ARGUMENTS` as a source of new planning requirements.
+- the provided command input is optional
+- if present, treat it only as a disambiguation hint for which already-finalized `/plan/create` draft to save
+- never treat the provided command input as a source of new planning requirements
 
 ## Required Behavior
 
