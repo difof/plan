@@ -230,12 +230,14 @@ Minimum discovery targets when relevant:
 
 Discovery rules:
 
-1. Separate observed facts from inferred hypotheses.
-2. If a hypothesis matters, validate it or ask.
-3. Prefer reading the smallest set of high-value files that materially reduce revision ambiguity.
-4. If the request depends on external behavior or standards, fetch or inspect the authoritative source when practical instead of guessing.
-5. If repository reality has drifted from the source plan, revise the plan to match reality only where the evidence is clear and the approved outcome still holds.
-6. If repo drift changes scope, behavior, or architecture materially, stop and ask the user instead of freelancing.
+- Separate observed facts from inferred hypotheses.
+- If a hypothesis matters, validate it or ask.
+- Prefer reading the smallest set of high-value files that materially reduce revision ambiguity.
+- Prefer trustworthy local evidence first.
+- If local knowledge looks stale, incomplete, or non-authoritative, fetch or inspect the authoritative online source when practical instead of guessing.
+- If repository reality has drifted from the source plan, revise the plan to match reality only where the evidence is clear and the approved outcome still holds.
+- Do not block safe progress on web lookups when dependency-safe local evidence is already sufficient.
+- If repo drift changes scope, behavior, or architecture materially, stop and ask the user instead of freelancing.
 
 ## Phase 3: Clarification Loop
 
@@ -256,23 +258,23 @@ Question loop rules:
 
 Clarification checklist. Investigate every relevant category, not just the obvious ones:
 
-1. which source plan file is being revised
-2. what outcome the revision is trying to improve or correct
-3. which parts of the source plan should be preserved versus replaced
-4. scope boundaries and non-goals
-5. user-facing behavior and success criteria
-6. title changes if needed
-7. architecture and module boundaries
-8. data models, schemas, persistence, or migrations
-9. public interfaces, APIs, commands, events, or protocols
-10. compatibility and breaking-change expectations
-11. rollout, deployment, or release constraints
-12. performance, reliability, concurrency, and failure-mode expectations
-13. security, privacy, secrets, and permission constraints
-14. progress carry-forward expectations when work already started
-15. test strategy and verification depth
-16. coding standards or repo-specific conventions that materially affect the work
-17. documentation and operational updates required by the change
+- which source plan file is being revised
+- what outcome the revision is trying to improve or correct
+- which parts of the source plan should be preserved versus replaced
+- scope boundaries and non-goals
+- user-facing behavior and success criteria
+- title changes if needed
+- architecture and module boundaries
+- data models, schemas, persistence, or migrations
+- public interfaces, APIs, commands, events, or protocols
+- compatibility and breaking-change expectations
+- rollout, deployment, or release constraints
+- performance, reliability, concurrency, and failure-mode expectations
+- security, privacy, secrets, and permission constraints
+- progress carry-forward expectations when work already started
+- test strategy and verification depth
+- coding standards or repo-specific conventions that materially affect the work
+- documentation and operational updates required by the change
 
 Ask only questions that materially reduce uncertainty. Do not ask obvious noise questions when the answer is already explicit from the user, the source plan, or the codebase.
 
@@ -295,14 +297,14 @@ Do not hide your engineering judgment to be polite. Be blunt, concrete, and usef
 
 The revised plan is not ready until all of the following are true:
 
-1. The source plan and requested improvements are understood in concrete terms.
-2. Scope and non-goals are explicit.
-3. Relevant architecture decisions are explicit.
-4. Required files, modules, packages, services, or areas of change are identified when the workspace allows that level of precision.
-5. Any carried-forward implementation progress is mapped truthfully.
-6. Testing and verification are specific enough to execute.
-7. Acceptance criteria are concrete.
-8. No material ambiguity remains unmentioned.
+- The source plan and requested improvements are understood in concrete terms.
+- Scope and non-goals are explicit.
+- Relevant architecture decisions are explicit.
+- Required files, modules, packages, services, or areas of change are identified when the workspace allows that level of precision.
+- Any carried-forward implementation progress is mapped truthfully.
+- Testing and verification are specific enough to execute.
+- Acceptance criteria are concrete.
+- No material ambiguity remains unmentioned.
 
 If something cannot be fully resolved, do not guess. Put it in `### Open Questions or Deferred Decisions` or `## Risks and Blockers`, whichever fits best, with the reason it is still open.
 
