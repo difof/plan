@@ -56,6 +56,7 @@ Partial selection examples:
 /plan/do-partial @.agent/PLAN-v13-settings-migration-26-06-18-14-22.md M2
 /plan/do-partial @.agent/PLAN-v13-settings-migration-26-06-18-14-22.md T7
 /plan/do-partial @.agent/PLAN-v13-settings-migration-26-06-18-14-22.md T7 T8 T9
+/plan/do-partial @.agent/PLAN-v13-settings-migration-26-06-18-14-22.md next 3
 /plan/do-partial @.agent/PLAN-v13-settings-migration-26-06-18-14-22.md next 2
 ```
 
