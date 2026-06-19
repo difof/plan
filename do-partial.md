@@ -21,9 +21,10 @@ Execute only a bounded slice of one saved markdown implementation plan artifact 
 - After the plan reference, the remaining tokens choose one of these modes:
   - `<plan>`
   - `<plan> next`
-  - `<plan> next <count>`
+  - `<plan> next <N>`
   - `<plan> <selector>`
   - `<plan> <task-id> <task-id> ...`
+- Treat `next <N>` as a dedicated selector form, not as generic multi-token selector text.
 - `<selector>` may be:
   - exact milestone ID like `M2`
   - exact task ID like `T7`
@@ -36,6 +37,7 @@ Execute only a bounded slice of one saved markdown implementation plan artifact 
 - If a count is provided:
   - it is only valid in `next` mode
   - it must be a positive integer
+  - it means `select the next N tasks`
   - it caps the number of tasks in the selected direct dependency chain
 - If a trailing integer appears after a non-`next` selector, treat that as invalid input instead of guessing whether it is part of the selector or a count override.
 - If no selector is provided, use deterministic `next` mode.
@@ -154,13 +156,21 @@ If those signals are missing, contradictory, or only implied in prose, stop and 
 
 Resolve the requested slice using this priority order:
 
-1. exact milestone ID match
-2. exact task ID match
-3. exact milestone label match
-4. exact task label match
-5. unique fuzzy milestone or task text match
+1. exact `next` mode or `next <N>` mode
+2. exact milestone ID match
+3. exact task ID match
+4. exact milestone label match
+5. exact task label match
+6. unique fuzzy milestone or task text match
 
-If there are multiple selectors after `<plan>`, first determine whether the invocation is explicit multi-task mode:
+If the first token after `<plan>` is `next`, resolve the invocation as deterministic `next` mode before considering any other selector form:
+
+1. plain `next` means use the default deterministic chain length
+2. `next <N>` means use deterministic `next` mode with a positive integer count cap of `N`
+3. any extra token after `next <N>` is invalid
+4. `next` mode must never fall through into generic selector or explicit multi-task resolution
+
+If there are multiple selectors after `<plan>` and the first token is not `next`, first determine whether the invocation is explicit multi-task mode:
 
 1. multi-task mode is only valid when every selector token is an exact task ID
 2. if any selector token is not an exact task ID, fail instead of mixing selector styles
@@ -219,7 +229,7 @@ When no explicit selector is given, or when the selector token is `next`:
    - if exactly one such candidate exists, append it to the slice
    - if zero such candidates exist, stop the chain
    - if more than one such candidate exists, stop at the branch point instead of guessing
-5. If a count was provided, stop when the selected slice reaches that many tasks, even if the chain could continue.
+5. If a count was provided through `next <N>`, stop when the selected slice reaches that many tasks, even if the chain could continue.
 6. If no runnable pending task can be identified deterministically, hard fail.
 
 ## Required Plan-File Updates
