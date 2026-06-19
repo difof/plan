@@ -348,6 +348,21 @@ When the user approves the revised plan for saving, apply the rules for the reso
 5. Do not rename the file to match a new title unless the user explicitly asks for a rename.
 6. If the artifact includes `file path` metadata, update it to the actual persisted path.
 
+### In-Place Identity and Order Stability
+
+For semantically unchanged work in `in_place` mode:
+
+- preserve existing milestone IDs and task IDs by default
+- preserve existing milestone checklist order, milestone-owned task order, and tracker row order by default
+- preserve existing hard dependency references unless the approved revision materially changes the task graph
+- do not renumber or re-sequence unchanged milestones or tasks for readability, contiguous numbering, or numeric sort order alone
+
+Treat shifting as an intentional structural operation, not cosmetic cleanup.
+
+- a shift is justified when the approved revision materially changes milestone ownership, hard dependencies, or the preferred execution order
+- if a shift is not needed, preserve the current task and milestone placement
+- if a shift is needed, update only the affected milestone lists, task blocks, tracker rows, and dependency references needed to keep the artifact truthful and internally consistent
+
 ## In-Place Save Strategies
 
 When output mode is `in_place`, the final approval step must offer two save strategies.
@@ -364,6 +379,7 @@ Behavior:
 
 - rewrite the full file in place as the updated canonical artifact
 - preserve truthful execution state, file path, and internal version metadata unless the user explicitly changes them
+- preserve surviving milestone IDs, task IDs, and execution order unless the approved revision materially restructures the task graph enough that remapping is clearly safer and must be done intentionally
 - use the full revised section structure needed for a clear implementation-ready artifact
 
 ### `patch_plan`
@@ -380,6 +396,9 @@ Behavior:
 - preserve unchanged sections, section order, headings, and wording wherever they still hold
 - do not expand untouched sections just to make them longer or more canonical
 - update only the sections, tracker rows, metadata fields, and cross-references needed to keep the file truthful and internally consistent
+- do not renumber or reorder unchanged milestones or tasks for readability, contiguous numbering, or numeric sort order alone
+- if new milestone or task entries must be inserted, assign the next available stable `M#` or `T#` and update only the affected cross-references instead of renumbering unchanged work
+- if a shift is required, preserve unchanged IDs while moving only the affected milestone/task blocks and tracker rows needed by the approved execution change
 - if patch mode cannot fully remove a known weakness without broader rewrite, record that clearly in the artifact rather than hiding it
 
 ## Final Artifact Requirements
@@ -680,13 +699,16 @@ Before writing the revised artifact:
    - in `new_version` mode, show the new version and title
    - in `in_place` mode, show that the existing file will be updated in place and whether the internal version field stays unchanged
 5. In `in_place` mode, add one short line explaining whether `rewrite_plan` or `patch_plan` is the better fit for this specific revision and why.
-6. Show a concise delta summary listing:
+6. In `in_place` mode, keep the summary structured and shift-aware:
+   - if no milestone or task shift is needed, say so briefly and do not invent reorder detail
+   - if shifting is needed, say that the tasks need a shift, show the affected task range using stable task IDs, and show milestone/task reorder detail only for the affected shift
+7. Show a concise delta summary listing:
    - sections changed
    - sections preserved
    - sections condensed
-7. If helpful, you may mention the source plan separately as revision input, but do not describe the saved `new_version` artifact as superseding or referencing it.
-8. Do not dump the full markdown plan body in chat.
-9. Ask one final confirmation question with the `question` tool.
+8. If helpful, you may mention the source plan separately as revision input, but do not describe the saved `new_version` artifact as superseding or referencing it.
+9. Do not dump the full markdown plan body in chat.
+10. Ask one final confirmation question with the `question` tool.
 
 Preview summary requirements:
 
@@ -696,6 +718,9 @@ Preview summary requirements:
 - include whether progress was carried forward from the source plan
 - include notable risks, deferred decisions, or user-forced tradeoffs when relevant
 - in `in_place` mode, include a short recommendation line explaining whether patching or rewriting is better for this save
+- in `in_place` mode, keep the summary structured; include shift details only when a real milestone or task shift is needed
+- if shifting is needed, say that explicitly and show the affected task range using stable task IDs such as `T5-T8` or `T5, T7-T8`
+- if shifting is needed, show milestone reorder or task reorder detail only for the affected items
 - include the section delta summary in compact form
 - keep it concise; the saved markdown artifact is the canonical full plan
 - the full plan content should be read from the saved `.md` file after persistence, not echoed in full before save
